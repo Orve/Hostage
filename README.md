@@ -1,99 +1,160 @@
-# HOSTAGE (MVP)
+# HOSTAGE
 
-> **"Your negligence kills."**
+<div align="center">
 
-**HOSTAGE** は、現実世界のタスク消化状況がバーチャルキャラクターの「命」に直結する、ホラーゲーミフィケーション・タスク管理アプリケーションです。
-Notionのタスク管理と連動し、タスクを放置するとキャラクターが衰弱し、画面が不穏な状態（グリッチ、ノイズ、警告色）へと変貌します。
+![Demo](./assets/demo.gif)
 
-![Status: DEAD](https://dummyimage.com/600x400/000/ff0000.png&text=DEAD+STATE)
-*(※実際の画面はCRTスキャンラインとグリッチエフェクトが適用されます)*
+**"Your negligence kills."**
 
-## 🛠 Features
+[![Live Demo](https://img.shields.io/badge/demo-live-red?style=for-the-badge)](https://your-actual-domain.vercel.app)
+[![Status](https://img.shields.io/badge/status-alpha-orange?style=for-the-badge)](https://github.com/yourusername/hostage)
 
-*   **Notion Sync**: Notionデータベースの「期限切れタスク」を自動取得し、キャラクターに物理的ダメージを与えます。
-*   **Decay System**: 時間経過とともにHPが減衰（感染進行）します。
-*   **Routine Healing**: 指定された習慣（Habit）を完了することで、HPを回復できます。
-*   **Horror UI**: HP低下に伴い、UIが「崩壊」します。
-    *   CRT Scanlines & Vignette Overlay
-    *   Glitch Text Animations
-    *   Dynamic Critical State (Red Pulse)
+*A horror-gamified productivity app where your virtual character's survival depends on your real-world task completion.*
+
+</div>
+
+---
+
+## 💀 The Concept
+
+Traditional task managers are too forgiving. Miss a deadline → feel vaguely guilty → move on. No real consequences.
+
+**HOSTAGE changes that.**
+
+Your character lives in a stasis pod. Their fate is tied to your Notion tasks. Procrastination isn't just inefficient—**it's lethal**.
+
+## ⚡ Features
+
+**Notion Sync**  
+Automatically detects overdue tasks from your Notion database and inflicts physical damage on your character. Real deadlines = real consequences.
+
+**Decay System**  
+HP decays over time, simulating infection progression. Time literally kills your character.
+
+**Routine Healing**  
+Complete designated habits to restore HP and stabilize the system. Productivity becomes survival.
+
+**Horror UI Corruption**  
+As HP drops, the interface degrades:
+- CRT scanlines and vignette overlays
+- Glitch text animations
+- Dynamic critical state (red pulse warnings)
+- System error messages
+
+**Watch the interface corrupt as you ignore your responsibilities.**
+
+## 🗺️ Roadmap
+
+### Phase 1: The Infection ⚡ IN PROGRESS
+- [x] Core Notion API integration
+- [x] HP decay system
+- [x] Horror UI effects (CRT, glitches)
+- [x] Stasis pod visualization
+- [x] Demo mode (no setup required)
+- [ ] Mobile PWA support
+
+### Phase 2: Web3 Integration (Q1 2025)
+- [ ] Solana wallet authentication
+- [ ] Dynamic NFTs that change with character health
+- [ ] Achievement system (permanent survivor badges)
+- [ ] The Graveyard (public memorial for deceased characters)
+- [ ] Revival Protocol (SOL-powered resurrection)
+
+### Phase 3: Community Features (Q2 2025)
+- [ ] Team survival mode
+- [ ] Global leaderboards
+- [ ] AI-generated horror scenarios
 
 ## 💻 Tech Stack
 
 ### Backend
-*   **Language**: Python 3.11+
-*   **Framework**: FastAPI
-*   **Database**: Supabase (PostgreSQL)
-*   **Validation**: Pydantic v2
-*   **Integration**: Notion API (`httpx`)
+- **Language**: Python 3.11+
+- **Framework**: FastAPI
+- **Database**: Supabase (PostgreSQL)
+- **Validation**: Pydantic v2
+- **Integration**: Notion API (`httpx`)
 
 ### Frontend
-*   **Framework**: Next.js 14 (App Router)
-*   **Styling**: Tailwind CSS
-*   **Language**: TypeScript
+- **Framework**: Next.js 14 (App Router)
+- **Styling**: Tailwind CSS
+- **Language**: TypeScript
 
 ## 🚀 Getting Started
 
 ### 1. Database Setup (Supabase)
-Supabaseプロジェクトを作成し、以下のテーブルが必要です。
-*   `profiles`: ユーザー情報
-*   `pets`: キャラクター状態管理
-*   `habits`: 習慣管理
+Create a Supabase project with these tables:
+- `profiles`: User information
+- `pets`: Character state management
+- `habits`: Habit tracking
 
 ### 2. Backend Setup
-ルートディレクトリで実行します。
 
 ```bash
-# 仮想環境作成 (推奨)
+# Create virtual environment
 python -m venv venv
-# Windows
+
+# Activate (Windows)
 .\venv\Scripts\activate
-# Mac/Linux
+# Activate (Mac/Linux)
 source venv/bin/activate
 
-# 依存関係インストール
+# Install dependencies
 pip install -r requirements.txt
 
-# 環境変数設定
-# .env.example をコピーして .env を作成し、自身のキーを設定してください
+# Configure environment
 cp .env.example .env
 ```
 
-**Required .env Variables:**
-*   `SUPABASE_URL`
-*   `SUPABASE_SERVICE_ROLE_KEY`
-*   `NOTION_TOKEN`
-*   `NOTION_DB_ID`
+Required environment variables:
 
-**Run Server:**
+```env
+SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_key
+NOTION_TOKEN=your_notion_integration_token
+NOTION_DB_ID=your_notion_database_id
+```
+
+Start the API server:
+
 ```bash
 uvicorn app.main:app --reload
 ```
-APIは `http://localhost:8000` で起動します。
+API runs at http://localhost:8000
 
 ### 3. Frontend Setup
-`frontend` ディレクトリで実行します。
 
 ```bash
 cd frontend
 
-# 依存関係インストール
+# Install dependencies
 npm install
 
-# 開発サーバー起動
+# Start development server
 npm run dev
 ```
-アプリは `http://localhost:3000` で起動します。
+App runs at http://localhost:3000
 
 ## ⚠️ MVP Configuration Note
-現在のMVPバージョンでは、デモを容易にするため、フロントエンド側で**ユーザーIDと習慣IDの設定**が必要な場合があります。
+For demo purposes, you may need to hardcode user/habit IDs:
 
-`frontend/app/page.tsx`:
 ```typescript
-// ご自身のSupabase User UUIDとHabit IDに適宜書き換えてください
-const USER_ID = "YOUR_UUID_HERE";
-const HABIT_ID = "YOUR_HABIT_UUID_HERE";
+// frontend/app/page.tsx
+const USER_ID = "YOUR_SUPABASE_UUID";
+const HABIT_ID = "YOUR_HABIT_UUID";
 ```
+This will be replaced with proper authentication in future releases.
+
+## 🎯 Philosophy
+**Guilt-driven productivity through emotional stakes.**
+
+HOSTAGE uses psychological horror to create genuine motivation. When your character's life depends on your productivity, task completion becomes urgent and personal.
+
+This isn't gamification—it's emotional warfare against procrastination.
 
 ## 📜 License
-Personal Project.
+Personal Project - All Rights Reserved
+
+---
+Built with psychological horror and FastAPI 💀
+
+**"Your negligence kills."**
