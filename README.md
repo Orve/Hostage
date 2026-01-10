@@ -4,7 +4,10 @@
 
 ![Demo](./assets/demo.gif)
 
+
 **"Your negligence kills."**
+=======
+![CPT2601110741-672x783](https://github.com/user-attachments/assets/a763e9bf-eb73-410c-9ace-73e1d11b1900)
 
 [![Live Demo](https://img.shields.io/badge/demo-live-red?style=for-the-badge)](https://your-actual-domain.vercel.app)
 [![Status](https://img.shields.io/badge/status-alpha-orange?style=for-the-badge)](https://github.com/yourusername/hostage)
