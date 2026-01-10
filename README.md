@@ -5,8 +5,8 @@
 **HOSTAGE** は、現実世界のタスク消化状況がバーチャルキャラクターの「命」に直結する、ホラーゲーミフィケーション・タスク管理アプリケーションです。
 Notionのタスク管理と連動し、タスクを放置するとキャラクターが衰弱し、画面が不穏な状態（グリッチ、ノイズ、警告色）へと変貌します。
 
-![Status: DEAD](https://dummyimage.com/600x400/000/ff0000.png&text=DEAD+STATE)
-*(※実際の画面はCRTスキャンラインとグリッチエフェクトが適用されます)*
+![CPT2601110741-672x783](https://github.com/user-attachments/assets/a763e9bf-eb73-410c-9ace-73e1d11b1900)
+
 
 ## 🛠 Features
 
@@ -97,3 +97,4 @@ const HABIT_ID = "YOUR_HABIT_UUID_HERE";
 
 ## 📜 License
 Personal Project.
+
