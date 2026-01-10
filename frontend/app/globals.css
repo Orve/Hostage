@@ -2,7 +2,8 @@
 
 :root {
   --background: #000000;
-  --foreground: #00ff41; /* CRT Green */
+  --foreground: #00ff41;
+  /* CRT Green */
 }
 
 @theme inline {
@@ -27,18 +28,18 @@ body {
 .scanlines::before {
   content: " ";
   display: block;
-  position: fixed; /* Fixed to cover screen */
+  position: fixed;
+  /* Fixed to cover screen */
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.25) 50%
-  );
+  background: linear-gradient(to bottom,
+      rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.25) 50%);
   background-size: 100% 4px;
-  z-index: 50; /* Above everything */
+  z-index: 50;
+  /* Above everything */
   pointer-events: none;
 }
 
@@ -51,32 +52,70 @@ body {
   left: 0;
   bottom: 0;
   right: 0;
-  background: radial-gradient(
-    circle,
-    rgba(0, 0, 0, 0) 60%,
-    rgba(0, 0, 0, 0.8) 100%
-  );
+  background: radial-gradient(circle,
+      rgba(0, 0, 0, 0) 60%,
+      rgba(0, 0, 0, 0.8) 100%);
   z-index: 50;
   pointer-events: none;
 }
 
 /* 3. Text Glitch Animation */
 @keyframes glitch-skew {
-  0% { transform: skew(0deg); }
-  20% { transform: skew(-2deg); }
-  40% { transform: skew(2deg); }
-  60% { transform: skew(-1deg); }
-  80% { transform: skew(1deg); }
-  100% { transform: skew(0deg); }
+  0% {
+    transform: skew(0deg);
+  }
+
+  20% {
+    transform: skew(-2deg);
+  }
+
+  40% {
+    transform: skew(2deg);
+  }
+
+  60% {
+    transform: skew(-1deg);
+  }
+
+  80% {
+    transform: skew(1deg);
+  }
+
+  100% {
+    transform: skew(0deg);
+  }
 }
 
 @keyframes glitch-anim-1 {
-  0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 1px); }
-  20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -1px); }
-  40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, 2px); }
-  60% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); }
-  80% { clip-path: inset(10% 0 70% 0); transform: translate(-1px, 1px); }
-  100% { clip-path: inset(30% 0 50% 0); transform: translate(1px, -1px); }
+  0% {
+    clip-path: inset(20% 0 80% 0);
+    transform: translate(-2px, 1px);
+  }
+
+  20% {
+    clip-path: inset(60% 0 10% 0);
+    transform: translate(2px, -1px);
+  }
+
+  40% {
+    clip-path: inset(40% 0 50% 0);
+    transform: translate(-2px, 2px);
+  }
+
+  60% {
+    clip-path: inset(80% 0 5% 0);
+    transform: translate(2px, -2px);
+  }
+
+  80% {
+    clip-path: inset(10% 0 70% 0);
+    transform: translate(-1px, 1px);
+  }
+
+  100% {
+    clip-path: inset(30% 0 50% 0);
+    transform: translate(1px, -1px);
+  }
 }
 
 .glitch-text {
@@ -111,9 +150,17 @@ body {
 
 /* 4. Critical State (Red Flashing) */
 @keyframes critical-pulse {
-  0% { box-shadow: inset 0 0 10px #300000; }
-  50% { box-shadow: inset 0 0 50px #ff0000; }
-  100% { box-shadow: inset 0 0 10px #300000; }
+  0% {
+    box-shadow: inset 0 0 10px #300000;
+  }
+
+  50% {
+    box-shadow: inset 0 0 50px #ff0000;
+  }
+
+  100% {
+    box-shadow: inset 0 0 10px #300000;
+  }
 }
 
 .critical-state {
@@ -124,4 +171,88 @@ body {
 .dead-state {
   filter: grayscale(100%) contrast(1.5);
   background-color: #1a1a1a;
+}
+
+/* 5. Image Glitch Animations */
+@keyframes glitch-occasional {
+  0% {
+    transform: translate(0);
+    opacity: 1;
+  }
+
+  2% {
+    transform: translate(-3px, 1px);
+    opacity: 0.8;
+  }
+
+  4% {
+    transform: translate(3px, -1px);
+    opacity: 0.9;
+  }
+
+  5% {
+    transform: translate(0);
+    opacity: 1;
+  }
+
+  98% {
+    transform: translate(0);
+    opacity: 1;
+  }
+
+  99% {
+    transform: translate(2px, 0);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: translate(0);
+    opacity: 1;
+  }
+}
+
+.glitch-occasional {
+  animation: glitch-occasional 4s infinite;
+}
+
+@keyframes glitch-heavy {
+  0% {
+    transform: translate(0) scale(1);
+    filter: hue-rotate(0deg);
+    clip-path: inset(0 0 0 0);
+  }
+
+  20% {
+    transform: translate(-5px, 2px) scale(1.02);
+    filter: hue-rotate(90deg);
+    clip-path: inset(10% 0 80% 0);
+  }
+
+  40% {
+    transform: translate(5px, -2px) scale(0.98);
+    filter: hue-rotate(-90deg);
+    clip-path: inset(80% 0 5% 0);
+  }
+
+  60% {
+    transform: translate(-5px, -2px) scale(1.05);
+    filter: hue-rotate(180deg);
+    clip-path: inset(20% 0 50% 0);
+  }
+
+  80% {
+    transform: translate(5px, 2px) scale(0.95);
+    filter: hue-rotate(45deg);
+    clip-path: inset(50% 0 20% 0);
+  }
+
+  100% {
+    transform: translate(0) scale(1);
+    filter: hue-rotate(0deg);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.glitch-heavy {
+  animation: glitch-heavy 0.2s infinite linear;
 }
