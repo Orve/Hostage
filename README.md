@@ -4,17 +4,28 @@
 
 ![Demo](./assets/demo.gif)
 
-
 **"Your negligence kills."**
-=======
-![CPT2601110741-672x783](https://github.com/user-attachments/assets/a763e9bf-eb73-410c-9ace-73e1d11b1900)
 
-[![Live Demo](https://img.shields.io/badge/demo-live-red?style=for-the-badge)](https://your-actual-domain.vercel.app)
+[![Live Demo](https://img.shields.io/badge/🎮_PLAY_NOW-red?style=for-the-badge)](https://your-actual-domain.vercel.app)
 [![Status](https://img.shields.io/badge/status-alpha-orange?style=for-the-badge)](https://github.com/yourusername/hostage)
 
 *A horror-gamified productivity app where your virtual character's survival depends on your real-world task completion.*
 
 </div>
+
+---
+
+## 🎮 Try It Now (No Setup Required)
+
+**Just click and play. No installation needed.**
+
+**👉 [Launch HOSTAGE Web App](https://your-actual-domain.vercel.app)**
+
+1. **Start in Demo Mode** - Experience the horror immediately (no account needed)
+2. **Connect Google Account** - Save your character's progress  
+3. **Link Notion** (Optional) - Real task sync for maximum psychological impact
+
+**The entire experience runs in your browser. Nothing to download or configure.**
 
 ---
 
@@ -40,7 +51,7 @@ Complete designated habits to restore HP and stabilize the system. Productivity 
 **Horror UI Corruption**  
 As HP drops, the interface degrades:
 - CRT scanlines and vignette overlays
-- Glitch text animations
+- Glitch text animations  
 - Dynamic critical state (red pulse warnings)
 - System error messages
 
@@ -53,7 +64,7 @@ As HP drops, the interface degrades:
 - [x] HP decay system
 - [x] Horror UI effects (CRT, glitches)
 - [x] Stasis pod visualization
-- [x] Demo mode (no setup required)
+- [ ] Enhanced demo mode
 - [ ] Mobile PWA support
 
 ### Phase 2: Web3 Integration (Q1 2025)
@@ -70,19 +81,32 @@ As HP drops, the interface degrades:
 
 ## 💻 Tech Stack
 
-### Backend
-- **Language**: Python 3.11+
-- **Framework**: FastAPI
-- **Database**: Supabase (PostgreSQL)
-- **Validation**: Pydantic v2
-- **Integration**: Notion API (`httpx`)
+**Frontend**: Next.js 14, TypeScript, Tailwind CSS  
+**Backend**: FastAPI, Supabase, Notion API  
+**Future Web3**: Solana, Metaplex NFTs
 
-### Frontend
-- **Framework**: Next.js 14 (App Router)
-- **Styling**: Tailwind CSS
-- **Language**: TypeScript
+## 🎯 Philosophy
 
-## 🚀 Getting Started
+**Guilt-driven productivity through emotional stakes.**
+
+HOSTAGE uses psychological horror to create genuine motivation. When your character's life depends on your productivity, task completion becomes urgent and personal.
+
+This isn't gamification—it's **emotional warfare against procrastination**.
+
+---
+
+## 🛠 For Developers
+
+<details>
+<summary><strong>Local Development & Self-Hosting Setup</strong></summary>
+
+> Only needed if you want to run HOSTAGE on your own infrastructure or contribute to development.
+
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- Supabase account
+- Notion integration token
 
 ### 1. Database Setup (Supabase)
 Create a Supabase project with these tables:
@@ -137,7 +161,7 @@ npm run dev
 ```
 App runs at http://localhost:3000
 
-## ⚠️ MVP Configuration Note
+### ⚠️ MVP Configuration Note
 For demo purposes, you may need to hardcode user/habit IDs:
 
 ```typescript
@@ -147,17 +171,11 @@ const HABIT_ID = "YOUR_HABIT_UUID";
 ```
 This will be replaced with proper authentication in future releases.
 
-## 🎯 Philosophy
-**Guilt-driven productivity through emotional stakes.**
-
-HOSTAGE uses psychological horror to create genuine motivation. When your character's life depends on your productivity, task completion becomes urgent and personal.
-
-This isn't gamification—it's emotional warfare against procrastination.
+</details>
 
 ## 📜 License
 Personal Project - All Rights Reserved
 
----
 Built with psychological horror and FastAPI 💀
 
-**"Your negligence kills."**
+"Your negligence kills."

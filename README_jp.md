@@ -2,13 +2,12 @@
 
 <div align="center">
 
-![CPT2601110741-672x783](https://github.com/user-attachments/assets/917625d4-5c6f-4c71-bdb1-061591eee03c)
-
+![Demo](./assets/demo.gif)
 
 **"Your negligence kills."**
 *(その怠慢が、命を奪う。)*
 
-[![Live Demo](https://img.shields.io/badge/demo-live-red?style=for-the-badge)](https://your-actual-domain.vercel.app)
+[![Live Demo](https://img.shields.io/badge/🎮_PLAY_NOW-red?style=for-the-badge)](https://your-actual-domain.vercel.app)
 [![Status](https://img.shields.io/badge/status-alpha-orange?style=for-the-badge)](https://github.com/yourusername/hostage)
 
 *現実世界のタスク消化状況が、バーチャルキャラクターの「生存」に直結する。*
@@ -18,7 +17,21 @@
 
 ---
 
-## 💀 コンセプト (The Concept)
+## 🎮 今すぐ試す（セットアップ不要）
+
+**クリックして遊ぶだけ。インストールは必要ありません。**
+
+**� [HOSTAGE Webアプリを起動](https://your-actual-domain.vercel.app)**
+
+1. **デモモードで開始** - すぐに恐怖体験を開始（アカウント不要）
+2. **Googleアカウント連携** - キャラクターの進行状況を保存
+3. **Notion連携** (任意) - リアルなタスク同期で心理的影響を最大化
+
+**すべてブラウザ上で完結します。ダウンロードや設定は不要です。**
+
+---
+
+## �💀 コンセプト (The Concept)
 
 従来のタスク管理アプリは優しすぎました。期限を過ぎても、少し罪悪感を感じるだけで、また次の日へ持ち越してしまう。そこには「本当の代償」がありません。
 
@@ -71,19 +84,34 @@ HPが低下するにつれて、インターフェースが腐敗していきま
 
 ## 💻 技術スタック (Tech Stack)
 
-### Backend
-- **Language**: Python 3.11+
-- **Framework**: FastAPI
-- **Database**: Supabase (PostgreSQL)
-- **Validation**: Pydantic v2
-- **Integration**: Notion API (`httpx`)
+**Frontend**: Next.js 14, TypeScript, Tailwind CSS  
+**Backend**: FastAPI, Supabase, Notion API  
+**Future Web3**: Solana, Metaplex NFTs
 
-### Frontend
-- **Framework**: Next.js 14 (App Router)
-- **Styling**: Tailwind CSS
-- **Language**: TypeScript
+## 🎯 開発哲学 (Philosophy)
 
-## 🚀 始め方 (Getting Started)
+**「感情的なステークス（利害）」を通じた、罪悪感駆動型の生産性。**
+
+HOSTAGE は、心理的ホラーを利用して「本物のモチベーション」を生み出します。
+キャラクターの命があなたの生産性に依存しているとき、タスク消化は緊急かつ個人的な問題へと変わります。
+
+これは単なるゲーミフィケーションではありません。
+**先延ばしに対する、感情的な戦争です。**
+
+---
+
+## 🛠 開発者の方へ
+
+<details>
+<summary><strong>ローカル開発環境・セルフホスティングのセットアップ</strong></summary>
+
+> ご自身のインフラで HOSTAGE を運用したい場合や、開発に貢献したい場合のみ必要です。
+
+### 前提条件
+- Python 3.11+
+- Node.js 18+
+- Supabase アカウント
+- Notion インテグレーション・トークン
 
 ### 1. データベースセットアップ (Supabase)
 Supabase プロジェクトを作成し、以下のテーブルを用意してください:
@@ -136,9 +164,10 @@ npm install
 # 開発サーバー起動
 npm run dev
 ```
+
 アプリは `http://localhost:3000` で稼働します。
 
-## ⚠️ MVP設定についての注意
+### ⚠️ MVP設定についての注意
 デモ目的のため、現状のバージョンではユーザーIDや習慣IDをコード内で指定する必要がある場合があります:
 
 ```typescript
@@ -146,21 +175,14 @@ npm run dev
 const USER_ID = "YOUR_SUPABASE_UUID";
 const HABIT_ID = "YOUR_HABIT_UUID";
 ```
+
 将来のリリースでは、適切な認証フローに置き換えられる予定です。
 
-## 🎯 開発哲学 (Philosophy)
-**「感情的なステークス（利害）」を通じた、罪悪感駆動型の生産性。**
-
-HOSTAGE は、心理的ホラーを利用して「本物のモチベーション」を生み出します。
-キャラクターの命があなたの生産性に依存しているとき、タスク消化は緊急かつ個人的な問題へと変わります。
-
-これは単なるゲーミフィケーションではありません。
-**先延ばしに対する、感情的な戦争です。**
+</details>
 
 ## 📜 ライセンス
 Personal Project - All Rights Reserved
 
----
 Built with psychological horror and FastAPI 💀
 
-**"Your negligence kills."**
+"Your negligence kills."
