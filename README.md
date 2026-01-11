@@ -19,7 +19,7 @@
 
 **Just click and play. No installation needed.**
 
-**👉 [Launch HOSTAGE Web App](https://your-actual-domain.vercel.app)**
+**👉 [Launch HOSTAGE Web App](https://hostage-app.xyz/)**
 
 1. **Start in Demo Mode** - Experience the horror immediately (no account needed)
 2. **Connect Google Account** - Save your character's progress  
@@ -177,5 +177,6 @@ This will be replaced with proper authentication in future releases.
 Personal Project - All Rights Reserved
 
 Built with psychological horror and FastAPI 💀
+
 
 "Your negligence kills."
