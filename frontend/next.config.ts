@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // WSL環境: package.jsonでCHOKIDAR_USEPOLLING=trueを設定済み
 };
 
 export default nextConfig;
