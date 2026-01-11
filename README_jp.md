@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Demo](.frontend/public/assets/demo.gif)
+![Demo](./frontend/public/assets/demo.gif)
 
 **"Your negligence kills."**
 *(その怠慢が、命を奪う。)*
