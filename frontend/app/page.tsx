@@ -87,7 +87,7 @@ export default function DemoPage() {
 
   return (
     <main className={`
-      min-h-screen p-8 flex flex-col items-center justify-center font-mono relative overflow-hidden transition-colors duration-1000
+      min-h-screen p-4 md:p-8 flex flex-col items-center justify-center font-mono relative overflow-hidden transition-colors duration-1000
       ${isDead ? "bg-black" : "bg-black"}
       scanlines vignette
     `}>
@@ -100,9 +100,9 @@ export default function DemoPage() {
       <div className={`relative z-10 w-full max-w-2xl transition-all duration-500 ${isDead ? "opacity-0" : "opacity-100"}`}>
 
         {/* Header */}
-        <header className="mb-12 text-center">
-          <h1 className={`text-4xl font-black tracking-[0.3em] uppercase mb-2 ${isCritical ? "text-red-600 glitch-text" : "text-green-500"}`} data-text="HOSTAGE_DEMO">
-            HOSTAGE_DEMO
+        <header className="mb-12 text-center px-4">
+          <h1 className={`text-2xl md:text-4xl lg:text-5xl font-black tracking-[0.1em] md:tracking-[0.3em] uppercase mb-2 ${isCritical ? "text-red-600 glitch-text" : "text-green-500"}`} data-text="HOSTAGE">
+            HOSTAGE
           </h1>
           <div className="text-xs tracking-widest text-gray-500">
             BUILD: 0.9.9 (MOCK) | USER: DEMO_ADMIN
@@ -110,7 +110,7 @@ export default function DemoPage() {
         </header>
 
         {/* Character Visual */}
-        <div className="flex justify-center mb-12 relative w-64 h-64 mx-auto">
+        <div className="flex justify-center mb-8 md:mb-12 relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mx-auto">
           {/* Character Image Container */}
           <div className={`
                 relative w-full h-full rounded-full overflow-hidden border-4 transition-all duration-500
@@ -146,7 +146,7 @@ export default function DemoPage() {
             <span>Integrity (HP)</span>
             <span className={isCritical ? "text-red-500 font-bold" : (isWarning ? "text-yellow-500" : "text-green-500")}>{hp} / {MAX_HP}</span>
           </div>
-          <div className="h-6 w-full bg-gray-900 border border-gray-700 rounded p-[2px]">
+          <div className="h-8 md:h-10 w-full bg-gray-900 border border-gray-700 rounded p-[2px]">
             <div
               className={`h-full transition-all duration-300 
                   ${isCritical ? "bg-red-600 shadow-[0_0_10px_red]" : (isWarning ? "bg-yellow-500 shadow-[0_0_5px_yellow]" : "bg-green-500 shadow-[0_0_10px_green]")}
@@ -154,7 +154,7 @@ export default function DemoPage() {
               style={{ width: `${(hp / MAX_HP) * 100}%` }}
             />
           </div>
-          <div className="text-center mt-4 text-xs tracking-[0.5em] text-gray-500">
+          <div className="text-center mt-4 text-xs tracking-[0.2em] md:tracking-[0.5em] text-gray-500 px-4">
             STATUS: <span className={isCritical ? "text-red-500 glitch-text" : "text-green-500"} data-text={getStatusText()}>{getStatusText()}</span>
           </div>
         </div>
@@ -176,7 +176,7 @@ export default function DemoPage() {
                 type="checkbox"
                 checked={habit.completed}
                 onChange={() => toggleHabit(habit.id)}
-                className="mr-4 w-5 h-5 accent-green-500 cursor-pointer"
+                className="mr-4 w-6 h-6 sm:w-5 sm:h-5 accent-green-500 cursor-pointer"
                 disabled={isDead}
               />
               <span className={`font-mono text-sm tracking-widest ${habit.completed ? "line-through text-gray-600" : "text-green-400 group-hover:text-green-300"}`}>
@@ -194,17 +194,17 @@ export default function DemoPage() {
           {/* Static Noise Overlay if available, else CSS noise */}
           <div className="absolute inset-0 bg-[url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif')] opacity-20 pointer-events-none mix-blend-screen" />
 
-          <h1 className="text-6xl md:text-8xl font-black text-red-600 tracking-widest uppercase glitch-text animate-pulse relative z-10" data-text="SIGNAL_LOST">
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-black text-red-600 tracking-wide md:tracking-widest uppercase glitch-text animate-pulse relative z-10 px-4" data-text="SIGNAL_LOST">
             SIGNAL LOST
           </h1>
-          <div className="mt-8 text-xs text-red-800 tracking-[1em] font-mono animate-bounce">
+          <div className="mt-8 text-xs text-red-800 tracking-[0.3em] md:tracking-[1em] font-mono animate-bounce px-4">
             CONNECTION_TERMINATED_BY_HOST
           </div>
         </div>
       )}
 
       {/* --- Debug Panel --- */}
-      <div className="fixed bottom-4 right-4 z-50 p-4 bg-black/80 border border-gray-800 backdrop-blur-sm rounded text-[10px] font-mono shadow-2xl opacity-50 hover:opacity-100 transition-opacity">
+      <div className="fixed bottom-4 right-4 z-50 p-4 bg-black/80 border border-gray-800 backdrop-blur-sm rounded text-[10px] font-mono shadow-2xl opacity-90 hover:opacity-100 transition-opacity">
         <div className="mb-2 text-gray-500 uppercase tracking-widest border-b border-gray-700 pb-1">Debug Control</div>
         <div className="flex flex-col gap-2">
           <button onClick={forceDamage} className="px-3 py-1 bg-yellow-900/30 text-yellow-500 border border-yellow-900 hover:bg-yellow-900/50 transition-colors uppercase text-left">
