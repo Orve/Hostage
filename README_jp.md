@@ -21,7 +21,7 @@
 
 **クリックして遊ぶだけ。インストールは必要ありません。**
 
-**� [HOSTAGE Webアプリを起動](https://your-actual-domain.vercel.app)**
+**� [HOSTAGE Webアプリを起動](https://hostage-app.xyz/)**
 
 1. **デモモードで開始** - すぐに恐怖体験を開始（アカウント不要）
 2. **Googleアカウント連携** - キャラクターの進行状況を保存
