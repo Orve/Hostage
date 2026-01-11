@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Demo](./assets/demo.gif)
+![Demo](./frontend/public/assets/demo.gif)
 
 **"Your negligence kills."**
 
@@ -180,3 +180,4 @@ Built with psychological horror and FastAPI 💀
 
 
 "Your negligence kills."
+
