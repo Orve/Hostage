@@ -2,7 +2,8 @@
 
 <div align="center">
 
-![Demo](./assets/demo.gif)
+![CPT2601110741-672x783](https://github.com/user-attachments/assets/917625d4-5c6f-4c71-bdb1-061591eee03c)
+
 
 **"Your negligence kills."**
 *(その怠慢が、命を奪う。)*
