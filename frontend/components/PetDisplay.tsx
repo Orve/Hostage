@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface PetProps {
   pet: {
@@ -14,40 +15,80 @@ export default function PetDisplay({ pet }: PetProps) {
   if (!pet) return <div className="text-gray-500">No Active Pet</div>;
 
   const hpPercent = (pet.hp / pet.max_hp) * 100;
-  const isDead = pet.status === 'DEAD';
+  const isDead = pet.status === 'DEAD' || pet.hp <= 0;
+  const isCritical = pet.hp > 0 && pet.hp <= 29;
+  const isWarning = pet.hp >= 30 && pet.hp < 80;
+
+  // Image Selector
+  const getCharacterImage = () => {
+    if (pet.hp >= 80) return "/assets/status_normal.png";
+    if (pet.hp >= 30) return "/assets/status_warning.png";
+    return "/assets/status_critical.png";
+  };
+
+  // Status Text
+  const getStatusText = () => {
+    if (isDead) return "SYSTEM FAILURE";
+    if (isCritical) return "CRITICAL ERROR";
+    if (isWarning) return "UNSTABLE";
+    return "OPERATIONAL";
+  };
 
   return (
-    <div className={`p-6 rounded-xl border-2 ${isDead ? 'border-red-900 bg-red-950' : 'border-emerald-500 bg-black'}`}>
-      <h2 className={`text-2xl font-bold mb-4 ${isDead ? 'text-red-600 animate-pulse' : 'text-emerald-400'}`}>
-        {isDead ? '† DEAD †' : pet.name}
-      </h2>
+    <>
+      {/* Horror Overlay Effects */}
+      {isCritical && !isDead && (
+        <div className="fixed inset-0 pointer-events-none z-40 animate-pulse bg-red-900/10 mix-blend-overlay" />
+      )}
 
-      {/* Visual Representation (Placeholder) */}
-      <div className="flex justify-center mb-6">
-        <div className={`w-32 h-32 flex items-center justify-center text-4xl rounded-full border-4 
-          ${isDead ? 'border-red-800 bg-red-900' : 'border-emerald-500 bg-emerald-900'}`}>
-          {isDead ? '💀' : '🥚'}
+      {/* Character Visual */}
+      <div className="flex justify-center mb-8 md:mb-12 relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mx-auto">
+        <div className={`
+          relative w-full h-full rounded-full overflow-hidden border-4 transition-all duration-500
+          ${isCritical
+            ? "border-red-600 shadow-[0_0_50px_red] bg-red-900/20"
+            : isWarning
+              ? "border-yellow-600 shadow-[0_0_20px_yellow] brightness-75"
+              : "border-green-500 shadow-[0_0_30px_green] bg-green-900/10"
+          }
+        `}>
+          <div className={`
+            w-full h-full relative
+            ${isCritical ? "glitch-heavy" : ""}
+            ${isWarning ? "glitch-occasional" : "animate-pulse"}
+          `}>
+            <Image
+              src={getCharacterImage()}
+              alt="Character Status"
+              fill
+              className="object-cover"
+              priority
+              unoptimized
+            />
+          </div>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="space-y-2">
-        <div className="flex justify-between text-sm text-gray-400">
-          <span>HP</span>
-          <span>{pet.hp.toFixed(1)} / {pet.max_hp}</span>
+      {/* Status Bar */}
+      <div className="mb-12">
+        <div className="flex justify-between text-xs mb-2 uppercase tracking-widest text-gray-400">
+          <span>Integrity (HP)</span>
+          <span className={isCritical ? "text-red-500 font-bold" : (isWarning ? "text-yellow-500" : "text-green-500")}>
+            {pet.hp.toFixed(1)} / {pet.max_hp}
+          </span>
         </div>
-        <div className="w-full bg-gray-800 rounded-full h-4 overflow-hidden border border-gray-700">
+        <div className="h-8 md:h-10 w-full bg-gray-900 border border-gray-700 rounded p-[2px]">
           <div
-            className={`h-full transition-all duration-500 ${isDead ? 'bg-red-700' : 'bg-emerald-500'}`}
+            className={`h-full transition-all duration-300
+              ${isCritical ? "bg-red-600 shadow-[0_0_10px_red]" : (isWarning ? "bg-yellow-500 shadow-[0_0_5px_yellow]" : "bg-green-500 shadow-[0_0_10px_green]")}
+            `}
             style={{ width: `${hpPercent}%` }}
           />
         </div>
-
-        <div className="flex justify-between text-xs text-gray-500 mt-2">
-          <span>Infection: {pet.infection_level}</span>
-          <span>Status: {pet.status}</span>
+        <div className="text-center mt-4 text-xs tracking-[0.2em] md:tracking-[0.5em] text-gray-500 px-4">
+          STATUS: <span className={isCritical ? "text-red-500 glitch-text" : "text-green-500"} data-text={getStatusText()}>{getStatusText()}</span>
         </div>
       </div>
-    </div>
+    </>
   );
 }
