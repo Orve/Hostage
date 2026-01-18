@@ -1,0 +1,72 @@
+"use client";
+
+import { useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { createClient } from "../../../lib/supabase";
+
+function AuthCallbackContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const handleCallback = async () => {
+      const code = searchParams.get("code");
+
+      if (!code) {
+        console.error("No code found in callback");
+        router.push("/login?error=no_code");
+        return;
+      }
+
+      const supabase = createClient();
+
+      // Exchange code for session
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+      if (error) {
+        console.error("Error exchanging code:", error);
+        router.push(`/login?error=${encodeURIComponent(error.message)}`);
+        return;
+      }
+
+      if (data?.session) {
+        console.log("Authentication successful!");
+        router.push("/");
+      } else {
+        console.error("No session returned");
+        router.push("/login?error=no_session");
+      }
+    };
+
+    handleCallback();
+  }, [router, searchParams]);
+
+  return (
+    <div className="min-h-screen bg-black flex items-center justify-center font-mono scanlines vignette">
+      <div className="relative z-10 text-center">
+        <div className="text-green-500 text-2xl tracking-[0.3em] uppercase animate-pulse mb-4">
+          AUTHENTICATING
+        </div>
+        <div className="text-green-900 text-xs tracking-widest">
+          [ PLEASE_WAIT ]
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black flex items-center justify-center font-mono scanlines vignette">
+        <div className="relative z-10 text-center">
+          <div className="text-green-500 text-2xl tracking-[0.3em] uppercase animate-pulse mb-4">
+            INITIALIZING
+          </div>
+        </div>
+      </div>
+    }>
+      <AuthCallbackContent />
+    </Suspense>
+  );
+}
