@@ -11,9 +11,17 @@ import SystemError from "../components/SystemError";
 // テスト用の習慣ID（後でデータベースから取得するように変更予定）
 const HABIT_ID = "191a5781-7afd-4874-befb-6b6cf2a7f07e";
 
+type Pet = {
+  name: string;
+  hp: number;
+  max_hp: number;
+  status: 'ALIVE' | 'DEAD';
+  infection_level: number;
+};
+
 export default function Home() {
   const { user } = useAuth();
-  const [pet, setPet] = useState(null);
+  const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
