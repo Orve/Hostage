@@ -26,6 +26,41 @@ export type CreatePetRequest = {
   name: string;
 };
 
+export type Task = {
+  id: string;
+  user_id: string;
+  title: string;
+  description: string | null;
+  completed: boolean;
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  source: 'notion' | 'native';
+  due_date: string | null;
+  created_at: string;
+  updated_at: string;
+  completed_at: string | null;
+};
+
+export type CreateTaskRequest = {
+  user_id: string;
+  title: string;
+  description?: string;
+  priority?: 'low' | 'medium' | 'high' | 'critical';
+  due_date?: string;
+};
+
+export type TaskListResponse = {
+  tasks: Task[];
+  total: number;
+};
+
+export type TaskCompleteResponse = {
+  status: string;
+  task: Task;
+  pet: Pet;
+  healed: number;
+  message: string;
+};
+
 export async function fetchPetStatus(userId: string) {
   const res = await fetch(`${API_BASE}/pets/${userId}`, { cache: "no-store" });
   if (!res.ok) {
@@ -74,3 +109,71 @@ export async function createPet(petData: CreatePetRequest): Promise<Pet> {
   }
   return res.json();
 }
+
+// ========== タスク管理API ==========
+
+/**
+ * タスクを作成する
+ */
+export async function createTask(taskData: CreateTaskRequest): Promise<Task> {
+  const res = await fetch(`${API_BASE}/tasks/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(taskData),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new APIError(res.status, errorData.detail || "Failed to create task");
+  }
+  return res.json();
+}
+
+/**
+ * ユーザーのタスク一覧を取得する
+ */
+export async function fetchTasks(
+  userId: string,
+  completed?: boolean
+): Promise<TaskListResponse> {
+  let url = `${API_BASE}/tasks/${userId}`;
+  if (completed !== undefined) {
+    url += `?completed=${completed}`;
+  }
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new APIError(res.status, errorData.detail || "Failed to fetch tasks");
+  }
+  return res.json();
+}
+
+/**
+ * タスクを完了する（ペットのHPも回復）
+ */
+export async function completeTask(taskId: string): Promise<TaskCompleteResponse> {
+  const res = await fetch(`${API_BASE}/tasks/complete`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ task_id: taskId }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new APIError(res.status, errorData.detail || "Failed to complete task");
+  }
+  return res.json();
+}
+
+/**
+ * タスクを削除する
+ */
+export async function deleteTask(taskId: string): Promise<{ status: string; task_id: string }> {
+  const res = await fetch(`${API_BASE}/tasks/${taskId}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new APIError(res.status, errorData.detail || "Failed to delete task");
+  }
+  return res.json();
+}
+

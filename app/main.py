@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import pets, habits, sync
+from app.routers import pets, habits, sync, tasks
 
 app = FastAPI(title="HOSTAGE MVP")
 
@@ -19,3 +19,4 @@ def read_root():
 app.include_router(pets.router)
 app.include_router(habits.router)
 app.include_router(sync.router)
+app.include_router(tasks.router)

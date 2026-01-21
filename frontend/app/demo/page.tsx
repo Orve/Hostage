@@ -1,28 +1,39 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
+import StasisChamber from "../../components/StasisChamber";
+import DashboardLayout from "../../components/DashboardLayout";
 
 // --- Mock Data & Types ---
-type Habit = {
+type Task = {
   id: string;
   label: string;
   completed: boolean;
+  priority: 'low' | 'medium' | 'high' | 'critical';
 };
 
-const INITIAL_HABITS: Habit[] = [
-  { id: "h1", label: "NIGHTLY_BACKUP_ROUTINE", completed: false },
-  { id: "h2", label: "ADMINISTER_ANTIVIRUS_DOSE", completed: false },
-  { id: "h3", label: "VERIFY_INTEGRITY_LOGS", completed: false },
+const INITIAL_TASKS: Task[] = [
+  { id: "t1", label: "NIGHTLY_BACKUP_ROUTINE", completed: false, priority: 'medium' },
+  { id: "t2", label: "ADMINISTER_ANTIVIRUS_DOSE", completed: false, priority: 'high' },
+  { id: "t3", label: "VERIFY_INTEGRITY_LOGS", completed: false, priority: 'low' },
 ];
 
 const MAX_HP = 100;
 
+// 優先度別回復量
+const HEAL_AMOUNTS: Record<Task['priority'], number> = {
+  low: 3,
+  medium: 5,
+  high: 8,
+  critical: 12,
+};
+
 export default function DemoPage() {
   // --- State ---
   const [hp, setHp] = useState(80);
-  const [habits, setHabits] = useState<Habit[]>(INITIAL_HABITS);
+  const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
   const [isDead, setIsDead] = useState(false);
+  const [healMessage, setHealMessage] = useState<string | null>(null);
 
   // --- Effects ---
   useEffect(() => {
@@ -35,19 +46,20 @@ export default function DemoPage() {
   }, [hp]);
 
   // --- Logic ---
-  const toggleHabit = (id: string) => {
+  const completeTask = (id: string) => {
     if (isDead) return;
 
-    setHabits((prev) =>
-      prev.map((h) => {
-        if (h.id === id) {
-          const newState = !h.completed;
-          updateHp(newState ? 10 : -10);
-          return { ...h, completed: newState };
-        }
-        return h;
-      })
-    );
+    const task = tasks.find(t => t.id === id);
+    if (!task || task.completed) return;
+
+    // 楽観的更新
+    setTasks(prev => prev.filter(t => t.id !== id));
+
+    const healAmount = HEAL_AMOUNTS[task.priority];
+    setHp(prev => Math.min(prev + healAmount, MAX_HP));
+
+    setHealMessage(`+${healAmount} HP`);
+    setTimeout(() => setHealMessage(null), 2000);
   };
 
   const updateHp = (amount: number) => {
@@ -61,10 +73,19 @@ export default function DemoPage() {
   const forceKill = () => setHp(0);
   const forceReset = () => {
     setHp(MAX_HP);
-    setHabits(INITIAL_HABITS.map(h => ({ ...h, completed: false })));
+    setTasks(INITIAL_TASKS.map(t => ({ ...t, completed: false })));
     setIsDead(false);
   };
   const forceDamage = () => updateHp(-20);
+  const addTask = () => {
+    const newTask: Task = {
+      id: `t${Date.now()}`,
+      label: `TASK_${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
+      completed: false,
+      priority: (['low', 'medium', 'high', 'critical'] as const)[Math.floor(Math.random() * 4)],
+    };
+    setTasks(prev => [...prev, newTask]);
+  };
 
   // --- Render Helpers ---
   const isCritical = hp > 0 && hp <= 29;
@@ -77,138 +98,150 @@ export default function DemoPage() {
     return "/assets/status_critical.png";
   };
 
+  // Status
+  const getStatus = (): 'ALIVE' | 'DEAD' | 'CRITICAL' => {
+    if (isDead) return 'DEAD';
+    if (isCritical) return 'CRITICAL';
+    return 'ALIVE';
+  };
+
   // Status Text
   const getStatusText = () => {
-    if (isDead) return "SYSTEM FAILURE";
-    if (isCritical) return "CRITICAL ERROR";
+    if (isDead) return "SYSTEM_FAILURE";
+    if (isCritical) return "CRITICAL_ERROR";
     if (isWarning) return "UNSTABLE";
     return "OPERATIONAL";
   };
 
+  // 優先度カラー
+  const getPriorityColor = (priority: Task['priority']) => {
+    switch (priority) {
+      case 'critical': return 'border-red-500 text-red-400';
+      case 'high': return 'border-orange-500 text-orange-400';
+      case 'medium': return 'border-cyan-500 text-cyan-400';
+      case 'low': return 'border-gray-500 text-gray-400';
+    }
+  };
+
   return (
-    <main className={`
-      min-h-screen p-4 md:p-8 flex flex-col items-center justify-center font-mono relative overflow-hidden transition-colors duration-1000
-      ${isDead ? "bg-black" : "bg-black"}
-      scanlines vignette
-    `}>
-      {/* --- Horror Overlay Effects --- */}
-      {isCritical && !isDead && (
-        <div className="fixed inset-0 pointer-events-none z-40 animate-pulse bg-red-900/10 mix-blend-overlay" />
-      )}
-
-      {/* --- Main Interface --- */}
-      <div className={`relative z-10 w-full max-w-2xl transition-all duration-500 ${isDead ? "opacity-0" : "opacity-100"}`}>
-
-        {/* Header */}
-        <header className="mb-12 text-center px-4">
-          <h1 className={`text-2xl md:text-4xl lg:text-5xl font-black tracking-[0.1em] md:tracking-[0.3em] uppercase mb-2 ${isCritical ? "text-red-600 glitch-text" : "text-green-500"}`} data-text="HOSTAGE_DEMO">
-            HOSTAGE_DEMO
-          </h1>
-          <div className="text-xs tracking-widest text-gray-500">
-            BUILD: 0.9.9 (MOCK) | USER: DEMO_ADMIN
+    <>
+      <DashboardLayout
+        title="HOSTAGE"
+        buildVersion="1.1.0"
+        mode="DEMO"
+        isDead={isDead}
+        isCritical={isCritical}
+      >
+        {/* --- 回復メッセージ --- */}
+        {healMessage && (
+          <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-[100] px-6 py-3 bg-emerald-900/90 border border-emerald-500 text-emerald-400 text-2xl font-bold tracking-widest animate-bounce">
+            {healMessage}
           </div>
-        </header>
+        )}
 
-        {/* Character Visual */}
-        <div className="flex justify-center mb-8 md:mb-12 relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mx-auto">
-          {/* Character Image Container */}
-          <div className={`
-                relative w-full h-full rounded-full overflow-hidden border-4 transition-all duration-500
-                ${isCritical
-              ? "border-red-600 shadow-[0_0_50px_red] bg-red-900/20"
-              : isWarning
-                ? "border-yellow-600 shadow-[0_0_20px_yellow] brightness-75"
-                : "border-green-500 shadow-[0_0_30px_green] bg-green-900/10"
-            }
-             `}>
-            {/* Image with Dynamic Effects */}
-            <div className={`
-                 w-full h-full relative
-                 ${isCritical ? "glitch-heavy" : ""}
-                 ${isWarning ? "glitch-occasional" : "animate-pulse"}
-               `}>
-              {/* Placeholder for actual image if missing, using object-cover */}
-              <Image
-                src={getCharacterImage()}
-                alt="Character Status"
-                fill
-                className="object-cover"
-                priority
-                unoptimized // For local assets in mock
-              />
-            </div>
-          </div>
+        {/* Subject Name */}
+        <div className="text-center mb-4">
+          <h2 className="text-lg font-bold text-cyan-400 tracking-[0.2em] uppercase">
+            SUBJECT: DEMO_UNIT
+          </h2>
         </div>
 
-        {/* Status Bar */}
-        <div className="mb-12">
+        {/* ========== 培養槽 (StasisChamber) ========== */}
+        <div className={`w-full max-w-sm mx-auto ${isCritical ? 'animate-pulse' : ''}`}>
+          <StasisChamber
+            hp={hp}
+            maxHp={MAX_HP}
+            imageSrc={getCharacterImage()}
+            status={getStatus()}
+            glowIntensity={isCritical ? 'high' : 'normal'}
+          />
+        </div>
+
+        {/* ========== HPバー ========== */}
+        <div className="mt-6 mb-8">
           <div className="flex justify-between text-xs mb-2 uppercase tracking-widest text-gray-400">
-            <span>Integrity (HP)</span>
-            <span className={isCritical ? "text-red-500 font-bold" : (isWarning ? "text-yellow-500" : "text-green-500")}>{hp} / {MAX_HP}</span>
+            <span>INTEGRITY (HP)</span>
+            <span className={isCritical ? "text-red-500 font-bold" : (isWarning ? "text-yellow-500" : "text-green-500")}>
+              {hp} / {MAX_HP}
+            </span>
           </div>
-          <div className="h-8 md:h-10 w-full bg-gray-900 border border-gray-700 rounded p-[2px]">
+          <div className="h-6 md:h-8 w-full bg-gray-900 border border-gray-700 rounded p-[2px]">
             <div
-              className={`h-full transition-all duration-300 
-                  ${isCritical ? "bg-red-600 shadow-[0_0_10px_red]" : (isWarning ? "bg-yellow-500 shadow-[0_0_5px_yellow]" : "bg-green-500 shadow-[0_0_10px_green]")}
-                `}
+              className={`h-full transition-all duration-500 rounded-sm ${isCritical
+                  ? "bg-red-600 shadow-[0_0_15px_red]"
+                  : isWarning
+                    ? "bg-yellow-500 shadow-[0_0_10px_yellow]"
+                    : "bg-emerald-500 shadow-[0_0_15px_green]"
+                }`}
               style={{ width: `${(hp / MAX_HP) * 100}%` }}
             />
           </div>
-          <div className="text-center mt-4 text-xs tracking-[0.2em] md:tracking-[0.5em] text-gray-500 px-4">
+          <div className="text-center mt-3 text-xs tracking-[0.2em] text-gray-500">
             STATUS: <span className={isCritical ? "text-red-500 glitch-text" : "text-green-500"} data-text={getStatusText()}>{getStatusText()}</span>
           </div>
         </div>
 
-        {/* Habits List */}
-        <div className="space-y-4">
-          <h2 className="text-sm uppercase tracking-widest text-gray-500 border-b border-gray-800 pb-2 mb-4">
-            [ MAINTAIN_ROUTINE ]
-          </h2>
-          {habits.map((habit) => (
-            <label
-              key={habit.id}
-              className={`
-                 flex items-center p-4 border border-gray-800 bg-black/50 cursor-pointer hover:bg-gray-900 transition-all group
-                 ${habit.completed ? "opacity-30 grayscale" : "opacity-100"}
-               `}
+        {/* ========== タスクリスト ========== */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold text-cyan-400 tracking-[0.2em] uppercase">
+              ACTIVE_TASKS
+            </h3>
+            <button
+              onClick={addTask}
+              className="px-3 py-1 text-xs border border-cyan-700 text-cyan-400 hover:bg-cyan-900/30 tracking-wider uppercase"
             >
-              <input
-                type="checkbox"
-                checked={habit.completed}
-                onChange={() => toggleHabit(habit.id)}
-                className="mr-4 w-6 h-6 sm:w-5 sm:h-5 accent-green-500 cursor-pointer"
-                disabled={isDead}
-              />
-              <span className={`font-mono text-sm tracking-widest ${habit.completed ? "line-through text-gray-600" : "text-green-400 group-hover:text-green-300"}`}>
-                {habit.label}
-              </span>
-            </label>
-          ))}
-        </div>
-
-      </div>
-
-      {/* --- Death State: SIGNAL LOST --- */}
-      {isDead && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black">
-          {/* Static Noise Overlay if available, else CSS noise */}
-          <div className="absolute inset-0 bg-[url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif')] opacity-20 pointer-events-none mix-blend-screen" />
-
-          <h1 className="text-4xl sm:text-6xl md:text-8xl font-black text-red-600 tracking-wide md:tracking-widest uppercase glitch-text animate-pulse relative z-10 px-4" data-text="SIGNAL_LOST">
-            SIGNAL LOST
-          </h1>
-          <div className="mt-8 text-xs text-red-800 tracking-[0.3em] md:tracking-[1em] font-mono animate-bounce px-4">
-            CONNECTION_TERMINATED_BY_HOST
+              + ADD
+            </button>
           </div>
+
+          {tasks.length === 0 ? (
+            <div className="text-center py-6 border border-dashed border-cyan-900/30">
+              <div className="text-cyan-800 text-xs tracking-widest">NO_ACTIVE_TASKS</div>
+              <div className="text-cyan-900/50 text-[10px] mt-1">CLICK ADD TO CREATE</div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {tasks.map((task) => (
+                <div
+                  key={task.id}
+                  className={`group flex items-center gap-3 p-3 border bg-black/60 hover:bg-black/80 transition-colors ${getPriorityColor(task.priority)}`}
+                >
+                  {/* 完了ボタン */}
+                  <button
+                    onClick={() => completeTask(task.id)}
+                    className="w-6 h-6 border border-current rounded flex items-center justify-center hover:bg-current/20 transition-colors"
+                    disabled={isDead}
+                  >
+                    <span className="text-xs opacity-0 group-hover:opacity-100 transition-opacity">✓</span>
+                  </button>
+
+                  {/* タスク情報 */}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-mono truncate">{task.label}</div>
+                    <div className="text-[10px] opacity-60 tracking-wider uppercase">
+                      {task.priority} | +{HEAL_AMOUNTS[task.priority]} HP
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {tasks.length > 0 && (
+            <div className="text-center text-[10px] text-cyan-900/50 tracking-widest">
+              {tasks.length} TASK{tasks.length > 1 ? 'S' : ''} | COMPLETE TO HEAL
+            </div>
+          )}
         </div>
-      )}
+      </DashboardLayout>
 
       {/* --- Debug Panel --- */}
       <div className="fixed bottom-4 right-4 z-50 p-4 bg-black/80 border border-gray-800 backdrop-blur-sm rounded text-[10px] font-mono shadow-2xl opacity-50 hover:opacity-100 transition-opacity">
         <div className="mb-2 text-gray-500 uppercase tracking-widest border-b border-gray-700 pb-1">Debug Control</div>
         <div className="flex flex-col gap-2">
           <button onClick={forceDamage} className="px-3 py-1 bg-yellow-900/30 text-yellow-500 border border-yellow-900 hover:bg-yellow-900/50 transition-colors uppercase text-left">
-            [!]-20 DMG
+            [!] -20 DMG
           </button>
           <button onClick={forceKill} className="px-3 py-1 bg-red-900/30 text-red-500 border border-red-900 hover:bg-red-900/50 transition-colors uppercase text-left">
             [X] KILL
@@ -218,7 +251,6 @@ export default function DemoPage() {
           </button>
         </div>
       </div>
-
-    </main>
+    </>
   );
 }

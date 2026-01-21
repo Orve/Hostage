@@ -1,5 +1,7 @@
+"use client";
+
 import React from 'react';
-import Image from 'next/image';
+import StasisChamber from './StasisChamber';
 
 interface PetProps {
   pet: {
@@ -11,6 +13,12 @@ interface PetProps {
   } | null;
 }
 
+/**
+ * PetDisplay - ペット表示コンポーネント
+ * 
+ * StasisChamber（培養槽）をベースに、Demo のレイアウト要素を統合。
+ * HPバー、ステータステキスト、グリッチエフェクトを含む。
+ */
 export default function PetDisplay({ pet }: PetProps) {
   if (!pet) return <div className="text-gray-500">No Active Pet</div>;
 
@@ -19,74 +27,93 @@ export default function PetDisplay({ pet }: PetProps) {
   const isCritical = pet.hp > 0 && pet.hp <= 29;
   const isWarning = pet.hp >= 30 && pet.hp < 80;
 
-  // Image Selector
+  // ステータス判定
+  const getStatus = (): 'ALIVE' | 'DEAD' | 'CRITICAL' => {
+    if (isDead) return 'DEAD';
+    if (isCritical) return 'CRITICAL';
+    return 'ALIVE';
+  };
+
+  // ステータステキスト
+  const getStatusText = () => {
+    if (isDead) return "SYSTEM_FAILURE";
+    if (isCritical) return "CRITICAL_ERROR";
+    if (isWarning) return "UNSTABLE";
+    return "OPERATIONAL";
+  };
+
+  // HP状態別の画像
   const getCharacterImage = () => {
     if (pet.hp >= 80) return "/assets/status_normal.png";
     if (pet.hp >= 30) return "/assets/status_warning.png";
     return "/assets/status_critical.png";
   };
 
-  // Status Text
-  const getStatusText = () => {
-    if (isDead) return "SYSTEM FAILURE";
-    if (isCritical) return "CRITICAL ERROR";
-    if (isWarning) return "UNSTABLE";
-    return "OPERATIONAL";
-  };
-
   return (
     <>
-      {/* Horror Overlay Effects */}
+      {/* ========== ホラーオーバーレイ（CRITICAL時） ========== */}
       {isCritical && !isDead && (
         <div className="fixed inset-0 pointer-events-none z-40 animate-pulse bg-red-900/10 mix-blend-overlay" />
       )}
 
-      {/* Character Visual */}
-      <div className="flex justify-center mb-8 md:mb-12 relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mx-auto">
-        <div className={`
-          relative w-full h-full rounded-full overflow-hidden border-4 transition-all duration-500
-          ${isCritical
-            ? "border-red-600 shadow-[0_0_50px_red] bg-red-900/20"
-            : isWarning
-              ? "border-yellow-600 shadow-[0_0_20px_yellow] brightness-75"
-              : "border-green-500 shadow-[0_0_30px_green] bg-green-900/10"
-          }
-        `}>
-          <div className={`
-            w-full h-full relative
-            ${isCritical ? "glitch-heavy" : ""}
-            ${isWarning ? "glitch-occasional" : "animate-pulse"}
-          `}>
-            <Image
-              src={getCharacterImage()}
-              alt="Character Status"
-              fill
-              className="object-cover"
-              priority
-              unoptimized
-            />
-          </div>
+      {/* ========== ペット名表示 ========== */}
+      <div className="text-center mb-4">
+        <h2 className="text-lg md:text-xl font-bold text-cyan-400 tracking-[0.2em] uppercase">
+          SUBJECT: {pet.name.toUpperCase()}
+        </h2>
+        <div className="text-[10px] text-cyan-700 tracking-widest">
+          INFECTION_LEVEL: {pet.infection_level}%
         </div>
       </div>
 
-      {/* Status Bar */}
-      <div className="mb-12">
+      {/* ========== 培養槽（StasisChamber） ========== */}
+      <div className={`
+        w-full max-w-sm mx-auto
+        ${isCritical ? 'animate-pulse' : ''}
+      `}>
+        <StasisChamber
+          hp={pet.hp}
+          maxHp={pet.max_hp}
+          imageSrc={getCharacterImage()}
+          status={getStatus()}
+          glowIntensity={isCritical ? 'high' : 'normal'}
+        />
+      </div>
+
+      {/* ========== HPバー（Demo スタイル） ========== */}
+      <div className="mt-6 mb-8">
         <div className="flex justify-between text-xs mb-2 uppercase tracking-widest text-gray-400">
-          <span>Integrity (HP)</span>
-          <span className={isCritical ? "text-red-500 font-bold" : (isWarning ? "text-yellow-500" : "text-green-500")}>
+          <span>INTEGRITY (HP)</span>
+          <span className={
+            isCritical ? "text-red-500 font-bold" :
+              isWarning ? "text-yellow-500" :
+                "text-green-500"
+          }>
             {pet.hp.toFixed(1)} / {pet.max_hp}
           </span>
         </div>
-        <div className="h-8 md:h-10 w-full bg-gray-900 border border-gray-700 rounded p-[2px]">
+        <div className="h-6 md:h-8 w-full bg-gray-900 border border-gray-700 rounded p-[2px]">
           <div
-            className={`h-full transition-all duration-300
-              ${isCritical ? "bg-red-600 shadow-[0_0_10px_red]" : (isWarning ? "bg-yellow-500 shadow-[0_0_5px_yellow]" : "bg-green-500 shadow-[0_0_10px_green]")}
-            `}
+            className={`h-full transition-all duration-500 rounded-sm ${isCritical
+                ? "bg-red-600 shadow-[0_0_15px_red]"
+                : isWarning
+                  ? "bg-yellow-500 shadow-[0_0_10px_yellow]"
+                  : "bg-emerald-500 shadow-[0_0_15px_green]"
+              }`}
             style={{ width: `${hpPercent}%` }}
           />
         </div>
-        <div className="text-center mt-4 text-xs tracking-[0.2em] md:tracking-[0.5em] text-gray-500 px-4">
-          STATUS: <span className={isCritical ? "text-red-500 glitch-text" : "text-green-500"} data-text={getStatusText()}>{getStatusText()}</span>
+        <div className="text-center mt-3 text-xs tracking-[0.2em] md:tracking-[0.3em] text-gray-500">
+          STATUS: <span
+            className={`
+              ${isCritical ? "text-red-500 glitch-text" : ""}
+              ${isWarning ? "text-yellow-500" : ""}
+              ${!isCritical && !isWarning ? "text-green-500" : ""}
+            `}
+            data-text={getStatusText()}
+          >
+            {getStatusText()}
+          </span>
         </div>
       </div>
     </>

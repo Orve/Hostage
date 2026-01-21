@@ -2,22 +2,23 @@
 
 import { useEffect, useState } from "react";
 import PetDisplay from "../components/PetDisplay";
-import ActionPanel from "../components/ActionPanel";
 import AuthGuard from "../components/AuthGuard";
 import { useAuth } from "../components/AuthProvider";
-import { fetchPetStatus, Pet } from "../lib/api";
+import { fetchPetStatus, Pet, syncNotion } from "../lib/api";
 import SystemError from "../components/SystemError";
 import CreatePetForm from "../components/CreatePetForm";
-
-// テスト用の習慣ID（後でデータベースから取得するように変更予定）
-const HABIT_ID = "191a5781-7afd-4874-befb-6b6cf2a7f07e";
+import TaskManager from "../components/TaskManager";
+import DashboardLayout from "../components/DashboardLayout";
 
 export default function Home() {
   const { user } = useAuth();
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
 
+  // 初回ロード用（ローディング表示あり）
   const loadData = async () => {
     if (!user?.id) return;
 
@@ -34,9 +35,38 @@ export default function Home() {
     }
   };
 
+  // 静かに更新（ローディング表示なし、タスク完了時用）
+  const refreshPetSilently = async () => {
+    if (!user?.id) return;
+    try {
+      const data = await fetchPetStatus(user.id);
+      setPet(data);
+    } catch (e) {
+      console.error("Silent refresh failed:", e);
+      // エラーは静かに無視（楽観的更新の補完なので）
+    }
+  };
+
   useEffect(() => {
     loadData();
   }, [user]);
+
+  // Notion同期
+  const handleSync = async () => {
+    if (!user?.id) return;
+
+    setSyncing(true);
+    setSyncMessage(null);
+    try {
+      const res = await syncNotion(user.id);
+      setSyncMessage(`SYNC: ${res.status} (DMG: ${res.damage_dealt})`);
+      await loadData();
+    } catch {
+      setSyncMessage("SYNC_FAILED");
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   // Show error state if data fetch failed
   if (error) {
@@ -51,55 +81,56 @@ export default function Home() {
     );
   }
 
+  // 状態判定
   const isDead = pet?.status === 'DEAD' || (pet && pet.hp <= 0);
+  const isCritical = pet ? pet.hp > 0 && pet.hp <= 29 : false;
 
   return (
     <AuthGuard>
-      <main className={`min-h-screen bg-black text-green-500 p-8 flex flex-col items-center justify-center font-mono scanlines vignette relative overflow-hidden transition-colors duration-1000`}>
-        <div className={`relative z-10 w-full max-w-lg flex flex-col items-center transition-all duration-500 ${isDead ? "opacity-0" : "opacity-100"}`}>
-          <h1 className="text-5xl font-black mb-12 tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-b from-gray-100 to-gray-600 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] uppercase">
-            HOSTAGE
-          </h1>
-
-          {loading ? (
-            <div className="text-center">
-              <div className="text-green-500 text-xl tracking-[0.3em] uppercase animate-pulse mb-4">
-                LOADING_SYSTEM
-              </div>
-              <div className="text-green-900 text-xs tracking-widest">
-                [ PLEASE_WAIT ]
-              </div>
+      <DashboardLayout
+        title="HOSTAGE"
+        buildVersion="1.1.0"
+        mode="AUTHENTICATED"
+        isDead={isDead}
+        isCritical={isCritical}
+      >
+        {loading ? (
+          <div className="text-center py-16">
+            <div className="text-cyan-500 text-xl tracking-[0.3em] uppercase animate-pulse mb-4">
+              LOADING_SYSTEM
             </div>
-          ) : pet ? (
-            <div className="w-full">
-              <PetDisplay pet={pet} />
-              <ActionPanel userId={user?.id || ""} habitId={HABIT_ID} onUpdate={loadData} />
-            </div>
-          ) : (
-            <CreatePetForm userId={user?.id || ""} onSuccess={loadData} />
-          )}
-
-          <div className="mt-16 text-[10px] text-green-900/50 text-center tracking-widest">
-            SYSTEM STATUS: OPERATIONAL<br />
-            BUILD v1.0.0 (AUTHENTICATED)
-          </div>
-        </div>
-
-        {/* Death State: SIGNAL LOST */}
-        {isDead && (
-          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black">
-            {/* Static Noise Overlay */}
-            <div className="absolute inset-0 bg-[url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif')] opacity-20 pointer-events-none mix-blend-screen" />
-
-            <h1 className="text-4xl sm:text-6xl md:text-8xl font-black text-red-600 tracking-wide md:tracking-widest uppercase glitch-text animate-pulse relative z-10 px-4" data-text="SIGNAL_LOST">
-              SIGNAL LOST
-            </h1>
-            <div className="mt-8 text-xs text-red-800 tracking-[0.3em] md:tracking-[1em] font-mono animate-bounce px-4">
-              CONNECTION_TERMINATED_BY_HOST
+            <div className="text-cyan-900 text-xs tracking-widest">
+              [ PLEASE_WAIT ]
             </div>
           </div>
+        ) : pet ? (
+          <div className="w-full">
+            <PetDisplay pet={pet} />
+
+            {/* Notion同期ボタン */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handleSync}
+                disabled={syncing}
+                className="w-full p-3 border border-cyan-900/50 bg-black hover:bg-cyan-900/20 active:bg-cyan-900/40 text-cyan-500 hover:text-cyan-300 transition-all text-xs tracking-widest uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {syncing ? 'SYNCING...' : 'SYNC_NOTION'}
+              </button>
+
+              {syncMessage && (
+                <div className="text-center text-[10px] text-gray-500 tracking-widest">
+                  &gt; {syncMessage}
+                </div>
+              )}
+            </div>
+
+            {/* タスク管理 */}
+            <TaskManager userId={user?.id || ""} onTaskComplete={refreshPetSilently} />
+          </div>
+        ) : (
+          <CreatePetForm userId={user?.id || ""} onSuccess={loadData} />
         )}
-      </main>
+      </DashboardLayout>
     </AuthGuard>
   );
 }

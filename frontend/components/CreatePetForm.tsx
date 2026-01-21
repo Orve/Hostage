@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { createPet } from "../lib/api";
 import StasisChamber from "./StasisChamber";
 
@@ -16,6 +17,7 @@ interface CreatePetFormProps {
  * 
  * 新規ユーザーがペットを作成するための没入感のあるフォーム。
  * StasisChamberと連携し、サイバーパンク・ホラーな雰囲気で演出。
+ * Framer Motion による劇的な誕生シーケンスを実装。
  */
 export default function CreatePetForm({ userId, onSuccess, mockMode = false }: CreatePetFormProps) {
   const [petName, setPetName] = useState("");
@@ -26,12 +28,19 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
   const [isFocused, setIsFocused] = useState(false);
 
   // 初期化シーケンス中の演出フェーズ
-  const [initPhase, setInitPhase] = useState<'idle' | 'initializing' | 'complete'>('idle');
+  const [initPhase, setInitPhase] = useState<'idle' | 'initializing' | 'awakening' | 'complete'>('idle');
 
   // ターミナル風の起動メッセージ
   const [bootMessages, setBootMessages] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const bootIndexRef = useRef(0);
+  const terminalRef = useRef<HTMLDivElement>(null);
+
+  // 心拍数（誕生シーケンス用）
+  const [heartbeatIntensity, setHeartbeatIntensity] = useState(0);
+
+  // フラッシュエフェクト
+  const [showFlash, setShowFlash] = useState(false);
 
   // 起動時のターミナルログアニメーション
   useEffect(() => {
@@ -57,14 +66,32 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
     return () => clearInterval(interval);
   }, []);
 
-  // メッセージが追加されたら自動スクロール
+  // メッセージが追加されたら自動スクロール（ターミナル内のみ）
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // ターミナル内部のみスクロール、ページ全体はスクロールしない
+    if (terminalRef.current && messagesEndRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
   }, [bootMessages]);
+
+  // 心拍アニメーション（初期化中）
+  useEffect(() => {
+    if (initPhase === 'initializing') {
+      // 徐々に心拍を強くする
+      const interval = setInterval(() => {
+        setHeartbeatIntensity(prev => Math.min(prev + 0.1, 1));
+      }, 200);
+      return () => clearInterval(interval);
+    } else if (initPhase === 'awakening') {
+      setHeartbeatIntensity(1);
+    } else {
+      setHeartbeatIntensity(0);
+    }
+  }, [initPhase]);
 
   // 培養槽の発光強度を決定
   const glowIntensity = useCallback((): 'low' | 'normal' | 'high' => {
-    if (initPhase === 'initializing') {
+    if (initPhase === 'initializing' || initPhase === 'awakening') {
       return 'high';
     }
     if (isFocused) {
@@ -72,6 +99,49 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
     }
     return 'normal';
   }, [isFocused, initPhase]);
+
+  // 誕生シーケンスの実行
+  const runBirthSequence = async () => {
+    // Phase 1: 初期化開始
+    setInitPhase('initializing');
+    
+    const initMessages = [
+      "[ INIT ] SEQUENCE_STARTED...",
+      "[ INIT ] VALIDATING_DESIGNATION...",
+      `[ INIT ] SUBJECT_ID: ${petName.trim().toUpperCase()}`,
+      "[ INIT ] ALLOCATING_CHAMBER_RESOURCES...",
+      "[ INIT ] SYNCING_BIOMETRICS...",
+      "[ INIT ] ESTABLISHING_NEURAL_LINK...",
+    ];
+
+    for (let i = 0; i < initMessages.length; i++) {
+      await new Promise(resolve => setTimeout(resolve, 400));
+      setBootMessages(prev => [...prev, initMessages[i]]);
+    }
+
+    // Phase 2: 覚醒シーケンス
+    setInitPhase('awakening');
+    
+    const awakeningMessages = [
+      "[ VITAL ] HEARTBEAT_DETECTED...",
+      "[ VITAL ] NEURAL_PATHWAYS_FORMING...",
+      "[ VITAL ] CONSCIOUSNESS_EMERGING...",
+    ];
+
+    for (const msg of awakeningMessages) {
+      await new Promise(resolve => setTimeout(resolve, 600));
+      setBootMessages(prev => [...prev, msg]);
+    }
+
+    // フラッシュエフェクト
+    setShowFlash(true);
+    await new Promise(resolve => setTimeout(resolve, 150));
+    setShowFlash(false);
+    await new Promise(resolve => setTimeout(resolve, 100));
+    setShowFlash(true);
+    await new Promise(resolve => setTimeout(resolve, 100));
+    setShowFlash(false);
+  };
 
   // フォーム送信処理
   const handleSubmit = async (e: React.FormEvent) => {
@@ -98,25 +168,11 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
 
     setLoading(true);
     setError(null);
-    setInitPhase('initializing');
-
-    // 初期化シーケンスのログを表示
-    const initMessages = [
-      "[ INIT ] SEQUENCE_STARTED...",
-      "[ INIT ] VALIDATING_DESIGNATION...",
-      `[ INIT ] SUBJECT_ID: ${petName.trim().toUpperCase()}`,
-      "[ INIT ] ALLOCATING_CHAMBER_RESOURCES...",
-      "[ INIT ] SYNCING_BIOMETRICS...",
-      "[ INIT ] ESTABLISHING_NEURAL_LINK...",
-    ];
-
-    // 順次メッセージを追加
-    for (let i = 0; i < initMessages.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 400));
-      setBootMessages(prev => [...prev, initMessages[i]]);
-    }
 
     try {
+      // 誕生シーケンスの演出を開始
+      await runBirthSequence();
+
       if (mockMode) {
         // モックモード: APIを呼ばずに疑似待機
         await new Promise(resolve => setTimeout(resolve, 800));
@@ -132,11 +188,17 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
 
       // 成功メッセージ
       setBootMessages(prev => [...prev, "[ SUCCESS ] SUBJECT_INITIALIZED"]);
+      setBootMessages(prev => [...prev, "[ SUCCESS ] LIFE_SIGNS_STABLE"]);
       setBootMessages(prev => [...prev, "[ SUCCESS ] REDIRECTING_TO_DASHBOARD..."]);
       setInitPhase('complete');
 
+      // 最終フラッシュ
+      setShowFlash(true);
+      await new Promise(resolve => setTimeout(resolve, 200));
+      setShowFlash(false);
+
       // 少し待ってからコールバック
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1200));
       onSuccess();
     } catch (err) {
       // エラーメッセージを適切に取得
@@ -155,60 +217,164 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
     }
   };
 
+  // 心拍振動のバリエーション
+  const heartbeatVariants = {
+    idle: { scale: 1, x: 0 },
+    beating: {
+      scale: [1, 1.02, 1, 1.01, 1],
+      x: [0, -2, 2, -1, 0],
+      transition: {
+        duration: 0.8,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }
+    },
+    intense: {
+      scale: [1, 1.05, 0.98, 1.03, 1],
+      x: [0, -4, 4, -2, 0],
+      filter: [
+        "brightness(1) hue-rotate(0deg)",
+        "brightness(1.2) hue-rotate(10deg)",
+        "brightness(0.9) hue-rotate(-10deg)",
+        "brightness(1.1) hue-rotate(5deg)",
+        "brightness(1) hue-rotate(0deg)",
+      ],
+      transition: {
+        duration: 0.5,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }
+    }
+  };
+
+  // 培養槽のアニメーションステート
+  const getChamberAnimation = () => {
+    if (initPhase === 'awakening') return 'intense';
+    if (initPhase === 'initializing') return 'beating';
+    return 'idle';
+  };
+
   return (
-    <div className="w-full max-w-xl mx-auto px-4">
+    <div className="w-full max-w-xl mx-auto px-4 relative">
+      {/* ========== フラッシュオーバーレイ ========== */}
+      <AnimatePresence>
+        {showFlash && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.05 }}
+            className="fixed inset-0 bg-cyan-200 z-[100] pointer-events-none"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* ========== ノイズオーバーレイ（初期化中） ========== */}
+      <AnimatePresence>
+        {(initPhase === 'initializing' || initPhase === 'awakening') && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.1 + heartbeatIntensity * 0.15 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-[url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif')] mix-blend-screen pointer-events-none z-[60]"
+          />
+        )}
+      </AnimatePresence>
+
       {/* メインコンテナ - モバイル対応でキーボード表示時にも崩れないように */}
-      <div className="flex flex-col items-center gap-6 md:gap-8">
+      <motion.div 
+        className="flex flex-col items-center gap-6 md:gap-8"
+        animate={initPhase === 'awakening' ? {
+          x: [0, -3, 3, -2, 2, 0],
+          transition: { duration: 0.3, repeat: Infinity }
+        } : {}}
+      >
 
         {/* ========== 培養槽プレビュー ========== */}
-        <div className={`
-          w-80 sm:w-96 md:w-[28rem] 
-          transition-all duration-500
-          ${initPhase === 'initializing' ? 'animate-pulse scale-105' : ''}
-          ${initPhase === 'complete' ? 'scale-110' : ''}
-        `}>
+        <motion.div
+          className="w-80 sm:w-96 md:w-[28rem]"
+          variants={heartbeatVariants}
+          animate={getChamberAnimation()}
+        >
           <StasisChamber
             hp={100}
             imageSrc="/assets/unnamed.png"
             status="UNINITIALIZED"
             glowIntensity={glowIntensity()}
           />
-        </div>
+        </motion.div>
 
         {/* ========== ターミナルログ表示エリア ========== */}
-        <div className="w-full max-h-24 md:max-h-32 overflow-y-auto bg-black/80 border border-cyan-900/50 rounded p-2 font-mono text-[10px] md:text-xs">
+        <motion.div
+          ref={terminalRef}
+          className="w-full max-h-24 md:max-h-32 overflow-y-auto bg-black/80 border border-cyan-900/50 rounded p-2 font-mono text-[10px] md:text-xs"
+          animate={initPhase === 'awakening' ? {
+            borderColor: ["rgba(6, 182, 212, 0.5)", "rgba(34, 211, 238, 0.8)", "rgba(6, 182, 212, 0.5)"],
+            boxShadow: [
+              "0 0 10px rgba(6, 182, 212, 0.3)",
+              "0 0 30px rgba(34, 211, 238, 0.6)",
+              "0 0 10px rgba(6, 182, 212, 0.3)",
+            ],
+            transition: { duration: 0.5, repeat: Infinity }
+          } : {}}
+        >
           {bootMessages
             .filter((msg): msg is string => typeof msg === 'string' && msg.length > 0)
             .map((msg, index) => (
-              <div
+              <motion.div
                 key={index}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.2 }}
                 className={`
                   ${msg.includes('ERROR') || msg.includes('FATAL') ? 'text-red-500' : ''}
                   ${msg.includes('SUCCESS') ? 'text-emerald-400' : ''}
                   ${msg.includes('INIT') ? 'text-cyan-400' : ''}
                   ${msg.includes('SYSTEM') ? 'text-green-500' : ''}
+                  ${msg.includes('VITAL') ? 'text-pink-400' : ''}
                   leading-relaxed
                 `}
               >
                 {msg}
-              </div>
+              </motion.div>
             ))}
           <div ref={messagesEndRef} />
           {/* ブリンキングカーソル */}
-          <span className="inline-block w-2 h-3 bg-green-500 animate-pulse" />
-        </div>
+          <motion.span
+            className="inline-block w-2 h-3 bg-green-500"
+            animate={{ opacity: [1, 0, 1] }}
+            transition={{ duration: 1, repeat: Infinity }}
+          />
+        </motion.div>
 
         {/* ========== 入力フォーム ========== */}
-        <div className="w-full">
+        <motion.div
+          className="w-full"
+          animate={initPhase === 'complete' ? {
+            scale: [1, 1.02, 1],
+            transition: { duration: 0.5 }
+          } : {}}
+        >
           <div className="relative border-2 border-cyan-900/60 bg-black/90 p-4 md:p-6 shadow-[0_0_30px_rgba(0,255,255,0.1)] backdrop-blur-sm">
             {/* グリッチオーバーレイ */}
             <div className="absolute inset-0 pointer-events-none opacity-5 bg-[url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif')] mix-blend-screen" />
 
             {/* ヘッダー */}
             <div className="relative z-10 mb-4 md:mb-6 text-center">
-              <h2 className="text-xl md:text-2xl font-black text-cyan-400 tracking-[0.15em] md:tracking-[0.2em] uppercase mb-1 glitch-text" data-text="INITIALIZE">
+              <motion.h2
+                className="text-xl md:text-2xl font-black text-cyan-400 tracking-[0.15em] md:tracking-[0.2em] uppercase mb-1 glitch-text"
+                data-text="INITIALIZE"
+                animate={initPhase === 'awakening' ? {
+                  textShadow: [
+                    "0 0 10px rgba(34, 211, 238, 0.5)",
+                    "0 0 30px rgba(34, 211, 238, 1)",
+                    "0 0 10px rgba(34, 211, 238, 0.5)",
+                  ],
+                  transition: { duration: 0.3, repeat: Infinity }
+                } : {}}
+              >
                 INITIALIZE
-              </h2>
+              </motion.h2>
               <div className="text-[10px] md:text-xs text-cyan-700 tracking-[0.2em] uppercase">
                 SUBJECT_REGISTRATION_PROTOCOL
               </div>
@@ -258,18 +424,27 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
               </div>
 
               {/* エラーメッセージ */}
-              {error && (
-                <div className="border border-red-900 bg-red-950/30 p-2 md:p-3 animate-pulse">
-                  <p className="text-red-500 text-xs tracking-wider text-center font-mono uppercase">
-                    ⚠ {error}
-                  </p>
-                </div>
-              )}
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="border border-red-900 bg-red-950/30 p-2 md:p-3"
+                  >
+                    <p className="text-red-500 text-xs tracking-wider text-center font-mono uppercase">
+                      ⚠ {error}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* 送信ボタン */}
-              <button
+              <motion.button
                 type="submit"
                 disabled={loading || !petName.trim() || petName.trim().length < 2}
+                whileHover={!loading ? { scale: 1.02, boxShadow: "0 0 20px rgba(34, 211, 238, 0.4)" } : {}}
+                whileTap={!loading ? { scale: 0.98 } : {}}
                 className={`
                   w-full p-3 md:p-4 
                   border-2 border-cyan-800 
@@ -279,14 +454,19 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
                   text-xs md:text-sm tracking-[0.15em] md:tracking-[0.2em] uppercase font-bold 
                   disabled:opacity-40 disabled:cursor-not-allowed 
                   group relative overflow-hidden
-                  ${loading ? 'animate-pulse' : ''}
                 `}
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   {loading ? (
                     <>
-                      <span className="w-3 h-3 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-                      <span>INITIALIZING...</span>
+                      <motion.span
+                        className="w-3 h-3 border-2 border-cyan-400 border-t-transparent rounded-full"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      />
+                      <span>
+                        {initPhase === 'awakening' ? 'AWAKENING...' : 'INITIALIZING...'}
+                      </span>
                     </>
                   ) : (
                     "[ INITIALIZE_SUBJECT ]"
@@ -294,7 +474,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
                 </span>
                 {/* ホバー時のスキャンライン */}
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-cyan-500/10 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
+              </motion.button>
             </form>
 
             {/* 警告メッセージ */}
@@ -309,10 +489,10 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
 
           {/* フッター */}
           <div className="text-center mt-3 text-[10px] text-cyan-900/50 tracking-[0.2em]">
-            CHAMBER_INITIALIZATION_v1.0.2
+            CHAMBER_INITIALIZATION_v1.0.3
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
