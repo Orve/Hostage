@@ -1,146 +1,317 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { createPet } from "../lib/api";
+import StasisChamber from "./StasisChamber";
 
 interface CreatePetFormProps {
   userId: string;
   onSuccess: () => void;
+  /** デモ用: trueの場合はAPIを呼ばずに疑似成功する */
+  mockMode?: boolean;
 }
 
-export default function CreatePetForm({ userId, onSuccess }: CreatePetFormProps) {
+/**
+ * CreatePetForm - 被験体初期化コンソール
+ * 
+ * 新規ユーザーがペットを作成するための没入感のあるフォーム。
+ * StasisChamberと連携し、サイバーパンク・ホラーな雰囲気で演出。
+ */
+export default function CreatePetForm({ userId, onSuccess, mockMode = false }: CreatePetFormProps) {
   const [petName, setPetName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 入力フィールドにフォーカスしているかどうか
+  const [isFocused, setIsFocused] = useState(false);
+
+  // 初期化シーケンス中の演出フェーズ
+  const [initPhase, setInitPhase] = useState<'idle' | 'initializing' | 'complete'>('idle');
+
+  // ターミナル風の起動メッセージ
+  const [bootMessages, setBootMessages] = useState<string[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const bootIndexRef = useRef(0);
+
+  // 起動時のターミナルログアニメーション
+  useEffect(() => {
+    const messages = [
+      "[ SYSTEM ] CHAMBER_INTERFACE_LOADED",
+      "[ SYSTEM ] AWAITING_SUBJECT_DESIGNATION...",
+      "[ SYSTEM ] ENTER_IDENTIFIER_TO_PROCEED",
+    ];
+
+    const interval = setInterval(() => {
+      const currentIndex = bootIndexRef.current;
+      if (currentIndex < messages.length) {
+        const message = messages[currentIndex];
+        if (message) {
+          setBootMessages(prev => [...prev, message]);
+        }
+        bootIndexRef.current = currentIndex + 1;
+      } else {
+        clearInterval(interval);
+      }
+    }, 600);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // メッセージが追加されたら自動スクロール
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [bootMessages]);
+
+  // 培養槽の発光強度を決定
+  const glowIntensity = useCallback((): 'low' | 'normal' | 'high' => {
+    if (initPhase === 'initializing') {
+      return 'high';
+    }
+    if (isFocused) {
+      return 'high';
+    }
+    return 'normal';
+  }, [isFocused, initPhase]);
+
+  // フォーム送信処理
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
+    // バリデーション
     if (!petName.trim()) {
       setError("DESIGNATION_REQUIRED");
+      setBootMessages(prev => [...prev, "[ ERROR ] EMPTY_DESIGNATION_REJECTED"]);
       return;
     }
 
     if (petName.trim().length < 2) {
       setError("DESIGNATION_TOO_SHORT");
+      setBootMessages(prev => [...prev, "[ ERROR ] MINIMUM_2_CHARACTERS_REQUIRED"]);
       return;
     }
 
     if (petName.trim().length > 50) {
       setError("DESIGNATION_TOO_LONG");
+      setBootMessages(prev => [...prev, "[ ERROR ] MAXIMUM_50_CHARACTERS_EXCEEDED"]);
       return;
     }
 
     setLoading(true);
     setError(null);
+    setInitPhase('initializing');
+
+    // 初期化シーケンスのログを表示
+    const initMessages = [
+      "[ INIT ] SEQUENCE_STARTED...",
+      "[ INIT ] VALIDATING_DESIGNATION...",
+      `[ INIT ] SUBJECT_ID: ${petName.trim().toUpperCase()}`,
+      "[ INIT ] ALLOCATING_CHAMBER_RESOURCES...",
+      "[ INIT ] SYNCING_BIOMETRICS...",
+      "[ INIT ] ESTABLISHING_NEURAL_LINK...",
+    ];
+
+    // 順次メッセージを追加
+    for (let i = 0; i < initMessages.length; i++) {
+      await new Promise(resolve => setTimeout(resolve, 400));
+      setBootMessages(prev => [...prev, initMessages[i]]);
+    }
 
     try {
-      // API call will be added in Task 2
-      // For now, simulate the call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (mockMode) {
+        // モックモード: APIを呼ばずに疑似待機
+        await new Promise(resolve => setTimeout(resolve, 800));
+        setBootMessages(prev => [...prev, "[ MOCK ] SIMULATING_API_RESPONSE..."]);
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } else {
+        // 本番: 実際のAPIを呼び出し
+        await createPet({
+          user_id: userId,
+          name: petName.trim(),
+        });
+      }
 
-      // Uncomment when API is ready:
-      // await createPet({
-      //   user_id: userId,
-      //   name: petName.trim(),
-      //   hp: 100.0,
-      //   max_hp: 100.0,
-      //   status: 'ALIVE',
-      //   infection_level: 0
-      // });
+      // 成功メッセージ
+      setBootMessages(prev => [...prev, "[ SUCCESS ] SUBJECT_INITIALIZED"]);
+      setBootMessages(prev => [...prev, "[ SUCCESS ] REDIRECTING_TO_DASHBOARD..."]);
+      setInitPhase('complete');
 
+      // 少し待ってからコールバック
+      await new Promise(resolve => setTimeout(resolve, 1000));
       onSuccess();
     } catch (err) {
-      setError("INITIALIZATION_FAILED");
-      console.error(err);
+      // エラーメッセージを適切に取得
+      let errorMessage = "INITIALIZATION_FAILED";
+      if (err instanceof Error) {
+        errorMessage = err.message || "UNKNOWN_ERROR";
+      }
+
+      setError(errorMessage);
+      setBootMessages(prev => [...prev, `[ FATAL ] ${errorMessage}`]);
+      setBootMessages(prev => [...prev, "[ FATAL ] INITIALIZATION_SEQUENCE_ABORTED"]);
+      setInitPhase('idle');
+      console.error("CreatePet Error:", err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      {/* Container */}
-      <div className="relative border-2 border-green-600 bg-black/90 p-6 md:p-8 shadow-[0_0_30px_rgba(0,255,65,0.2)]">
-        {/* Glitch overlay effect */}
-        <div className="absolute inset-0 pointer-events-none opacity-5 bg-[url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif')] mix-blend-screen" />
+    <div className="w-full max-w-xl mx-auto px-4">
+      {/* メインコンテナ - モバイル対応でキーボード表示時にも崩れないように */}
+      <div className="flex flex-col items-center gap-6 md:gap-8">
 
-        {/* Header */}
-        <div className="relative z-10 mb-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-black text-green-500 tracking-[0.2em] uppercase mb-2 glitch-text" data-text="INITIALIZE">
-            INITIALIZE
-          </h2>
-          <div className="text-xs text-green-900 tracking-[0.3em] uppercase">
-            NEW_SUBJECT_PROTOCOL
-          </div>
+        {/* ========== 培養槽プレビュー ========== */}
+        <div className={`
+          w-80 sm:w-96 md:w-[28rem] 
+          transition-all duration-500
+          ${initPhase === 'initializing' ? 'animate-pulse scale-105' : ''}
+          ${initPhase === 'complete' ? 'scale-110' : ''}
+        `}>
+          <StasisChamber
+            hp={100}
+            imageSrc="/assets/unnamed.png"
+            status="UNINITIALIZED"
+            glowIntensity={glowIntensity()}
+          />
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="relative z-10 space-y-6">
-          {/* Input Field */}
-          <div>
-            <label
-              htmlFor="petName"
-              className="block text-xs text-green-500 tracking-[0.2em] uppercase mb-2 font-mono"
-            >
-              SUBJECT_DESIGNATION
-            </label>
-            <input
-              id="petName"
-              type="text"
-              value={petName}
-              onChange={(e) => {
-                setPetName(e.target.value);
-                setError(null);
-              }}
-              disabled={loading}
-              placeholder="Enter designation..."
-              maxLength={50}
-              className="w-full px-4 py-3 bg-black border-2 border-green-900 text-green-400 font-mono text-sm tracking-wider placeholder:text-green-900/50 focus:border-green-500 focus:outline-none focus:shadow-[0_0_10px_rgba(0,255,65,0.3)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-            <div className="mt-1 text-[10px] text-green-900 tracking-widest">
-              {petName.length}/50 CHARACTERS
-            </div>
-          </div>
+        {/* ========== ターミナルログ表示エリア ========== */}
+        <div className="w-full max-h-24 md:max-h-32 overflow-y-auto bg-black/80 border border-cyan-900/50 rounded p-2 font-mono text-[10px] md:text-xs">
+          {bootMessages
+            .filter((msg): msg is string => typeof msg === 'string' && msg.length > 0)
+            .map((msg, index) => (
+              <div
+                key={index}
+                className={`
+                  ${msg.includes('ERROR') || msg.includes('FATAL') ? 'text-red-500' : ''}
+                  ${msg.includes('SUCCESS') ? 'text-emerald-400' : ''}
+                  ${msg.includes('INIT') ? 'text-cyan-400' : ''}
+                  ${msg.includes('SYSTEM') ? 'text-green-500' : ''}
+                  leading-relaxed
+                `}
+              >
+                {msg}
+              </div>
+            ))}
+          <div ref={messagesEndRef} />
+          {/* ブリンキングカーソル */}
+          <span className="inline-block w-2 h-3 bg-green-500 animate-pulse" />
+        </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="border border-yellow-900 bg-yellow-950/20 p-3 animate-pulse">
-              <p className="text-yellow-500 text-xs tracking-wider text-center font-mono uppercase">
-                ⚠ {error}
-              </p>
-            </div>
-          )}
+        {/* ========== 入力フォーム ========== */}
+        <div className="w-full">
+          <div className="relative border-2 border-cyan-900/60 bg-black/90 p-4 md:p-6 shadow-[0_0_30px_rgba(0,255,255,0.1)] backdrop-blur-sm">
+            {/* グリッチオーバーレイ */}
+            <div className="absolute inset-0 pointer-events-none opacity-5 bg-[url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif')] mix-blend-screen" />
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading || !petName.trim()}
-            className="w-full p-4 border-2 border-green-900 bg-black hover:bg-green-900/20 active:bg-green-900/40 text-green-500 hover:text-green-300 transition-all text-sm tracking-[0.2em] uppercase font-bold disabled:opacity-50 disabled:cursor-not-allowed group relative overflow-hidden"
-          >
-            <span className="relative z-10">
-              {loading ? (
-                <span className="animate-pulse">INITIALIZING_SUBJECT...</span>
-              ) : (
-                "[ BEGIN_PROTOCOL ]"
+            {/* ヘッダー */}
+            <div className="relative z-10 mb-4 md:mb-6 text-center">
+              <h2 className="text-xl md:text-2xl font-black text-cyan-400 tracking-[0.15em] md:tracking-[0.2em] uppercase mb-1 glitch-text" data-text="INITIALIZE">
+                INITIALIZE
+              </h2>
+              <div className="text-[10px] md:text-xs text-cyan-700 tracking-[0.2em] uppercase">
+                SUBJECT_REGISTRATION_PROTOCOL
+              </div>
+            </div>
+
+            {/* フォーム */}
+            <form onSubmit={handleSubmit} className="relative z-10 space-y-4 md:space-y-5">
+              {/* 入力フィールド */}
+              <div>
+                <label
+                  htmlFor="petName"
+                  className="block text-[10px] md:text-xs text-cyan-500 tracking-[0.15em] md:tracking-[0.2em] uppercase mb-2 font-mono"
+                >
+                  SUBJECT_IDENTIFIER:
+                </label>
+                <input
+                  id="petName"
+                  type="text"
+                  value={petName}
+                  onChange={(e) => {
+                    setPetName(e.target.value);
+                    setError(null);
+                  }}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  disabled={loading}
+                  placeholder="ENTER_DESIGNATION..."
+                  maxLength={50}
+                  autoComplete="off"
+                  className={`
+                    w-full px-3 md:px-4 py-2 md:py-3 
+                    bg-black border-2 
+                    ${isFocused ? 'border-cyan-400 shadow-[0_0_15px_rgba(0,255,255,0.3)]' : 'border-cyan-900'}
+                    text-cyan-300 font-mono text-sm tracking-wider 
+                    placeholder:text-cyan-900/50 
+                    focus:outline-none 
+                    transition-all duration-300
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                  `}
+                />
+                <div className="mt-1 flex justify-between text-[10px] text-cyan-800 tracking-widest">
+                  <span>{petName.length}/50 CHARS</span>
+                  {petName.length >= 2 && (
+                    <span className="text-cyan-500">✓ VALID</span>
+                  )}
+                </div>
+              </div>
+
+              {/* エラーメッセージ */}
+              {error && (
+                <div className="border border-red-900 bg-red-950/30 p-2 md:p-3 animate-pulse">
+                  <p className="text-red-500 text-xs tracking-wider text-center font-mono uppercase">
+                    ⚠ {error}
+                  </p>
+                </div>
               )}
-            </span>
-            <div className="absolute inset-0 bg-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-          </button>
-        </form>
 
-        {/* Warning Message */}
-        <div className="relative z-10 mt-6 border-t border-green-900/30 pt-4">
-          <div className="text-[10px] text-green-900/70 tracking-widest text-center space-y-1">
-            <div>⚠ WARNING: SUBJECT_MORTALITY_ENABLED</div>
-            <div>NEGLIGENCE_WILL_RESULT_IN_TERMINATION</div>
+              {/* 送信ボタン */}
+              <button
+                type="submit"
+                disabled={loading || !petName.trim() || petName.trim().length < 2}
+                className={`
+                  w-full p-3 md:p-4 
+                  border-2 border-cyan-800 
+                  bg-black hover:bg-cyan-900/20 active:bg-cyan-900/40 
+                  text-cyan-400 hover:text-cyan-300 
+                  transition-all duration-300
+                  text-xs md:text-sm tracking-[0.15em] md:tracking-[0.2em] uppercase font-bold 
+                  disabled:opacity-40 disabled:cursor-not-allowed 
+                  group relative overflow-hidden
+                  ${loading ? 'animate-pulse' : ''}
+                `}
+              >
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  {loading ? (
+                    <>
+                      <span className="w-3 h-3 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+                      <span>INITIALIZING...</span>
+                    </>
+                  ) : (
+                    "[ INITIALIZE_SUBJECT ]"
+                  )}
+                </span>
+                {/* ホバー時のスキャンライン */}
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-cyan-500/10 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
+            </form>
+
+            {/* 警告メッセージ */}
+            <div className="relative z-10 mt-4 md:mt-6 border-t border-cyan-900/30 pt-3 md:pt-4">
+              <div className="text-[9px] md:text-[10px] text-cyan-900/70 tracking-widest text-center space-y-1">
+                <div className="text-red-700">⚠ CAUTION: LIFE_SUPPORT_PROTOCOL_ACTIVE</div>
+                <div>SUBJECT_REQUIRES_DAILY_MAINTENANCE</div>
+                <div className="text-red-800">NEGLECT → SUBJECT_TERMINATION</div>
+              </div>
+            </div>
+          </div>
+
+          {/* フッター */}
+          <div className="text-center mt-3 text-[10px] text-cyan-900/50 tracking-[0.2em]">
+            CHAMBER_INITIALIZATION_v1.0.2
           </div>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div className="text-center mt-4 text-[10px] text-green-900/50 tracking-[0.3em]">
-        PROTOCOL_V1.0.0
       </div>
     </div>
   );

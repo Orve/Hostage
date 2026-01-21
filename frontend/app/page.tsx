@@ -5,19 +5,12 @@ import PetDisplay from "../components/PetDisplay";
 import ActionPanel from "../components/ActionPanel";
 import AuthGuard from "../components/AuthGuard";
 import { useAuth } from "../components/AuthProvider";
-import { fetchPetStatus } from "../lib/api";
+import { fetchPetStatus, Pet } from "../lib/api";
 import SystemError from "../components/SystemError";
+import CreatePetForm from "../components/CreatePetForm";
 
 // テスト用の習慣ID（後でデータベースから取得するように変更予定）
 const HABIT_ID = "191a5781-7afd-4874-befb-6b6cf2a7f07e";
-
-type Pet = {
-  name: string;
-  hp: number;
-  max_hp: number;
-  status: 'ALIVE' | 'DEAD';
-  infection_level: number;
-};
 
 export default function Home() {
   const { user } = useAuth();
@@ -83,14 +76,7 @@ export default function Home() {
               <ActionPanel userId={user?.id || ""} habitId={HABIT_ID} onUpdate={loadData} />
             </div>
           ) : (
-            <div className="text-center">
-              <div className="text-yellow-500 text-lg tracking-widest uppercase mb-2">
-                NO_PET_FOUND
-              </div>
-              <div className="text-yellow-900 text-xs tracking-wider">
-                Create a pet to begin monitoring
-              </div>
-            </div>
+            <CreatePetForm userId={user?.id || ""} onSuccess={loadData} />
           )}
 
           <div className="mt-16 text-[10px] text-green-900/50 text-center tracking-widest">

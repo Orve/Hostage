@@ -6,7 +6,7 @@ interface PetProps {
     name: string;
     hp: number;
     max_hp: number;
-    status: 'ALIVE' | 'DEAD';
+    status: 'ALIVE' | 'DEAD' | 'CRITICAL';
     infection_level: number;
   } | null;
 }

@@ -8,6 +8,24 @@ export class APIError extends Error {
   }
 }
 
+// Types
+export type Pet = {
+  id: string;
+  user_id: string;
+  name: string;
+  hp: number;
+  max_hp: number;
+  status: 'ALIVE' | 'DEAD' | 'CRITICAL';
+  infection_level: number;
+  born_at: string;
+  last_checked_at: string;
+};
+
+export type CreatePetRequest = {
+  user_id: string;
+  name: string;
+};
+
 export async function fetchPetStatus(userId: string) {
   const res = await fetch(`${API_BASE}/pets/${userId}`, { cache: "no-store" });
   if (!res.ok) {
@@ -37,6 +55,22 @@ export async function syncNotion(userId: string) {
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new APIError(res.status, errorData.detail || "Failed to sync notion");
+  }
+  return res.json();
+}
+
+export async function createPet(petData: CreatePetRequest): Promise<Pet> {
+  const res = await fetch(`${API_BASE}/pets/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: petData.user_id,
+      name: petData.name,
+    }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new APIError(res.status, errorData.detail || "Failed to create pet");
   }
   return res.json();
 }
