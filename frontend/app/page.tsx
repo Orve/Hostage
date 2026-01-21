@@ -81,8 +81,8 @@ export default function Home() {
     );
   }
 
-  // 状態判定
-  const isDead = pet?.status === 'DEAD' || (pet && pet.hp <= 0);
+  // 状態判定（null を false に変換）
+  const isDead = (pet?.status === 'DEAD' || (pet && pet.hp <= 0)) ?? false;
   const isCritical = pet ? pet.hp > 0 && pet.hp <= 29 : false;
 
   return (
