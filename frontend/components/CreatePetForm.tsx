@@ -104,7 +104,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
   const runBirthSequence = async () => {
     // Phase 1: 初期化開始
     setInitPhase('initializing');
-    
+
     const initMessages = [
       "[ INIT ] SEQUENCE_STARTED...",
       "[ INIT ] VALIDATING_DESIGNATION...",
@@ -121,7 +121,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
 
     // Phase 2: 覚醒シーケンス
     setInitPhase('awakening');
-    
+
     const awakeningMessages = [
       "[ VITAL ] HEARTBEAT_DETECTED...",
       "[ VITAL ] NEURAL_PATHWAYS_FORMING...",
@@ -217,7 +217,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
     }
   };
 
-  // 心拍振動のバリエーション
+  // 心拍振動のバリエーション（Framer Motion型互換）
   const heartbeatVariants = {
     idle: { scale: 1, x: 0 },
     beating: {
@@ -226,7 +226,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
       transition: {
         duration: 0.8,
         repeat: Infinity,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       }
     },
     intense: {
@@ -242,7 +242,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
       transition: {
         duration: 0.5,
         repeat: Infinity,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       }
     }
   };
@@ -282,7 +282,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
       </AnimatePresence>
 
       {/* メインコンテナ - モバイル対応でキーボード表示時にも崩れないように */}
-      <motion.div 
+      <motion.div
         className="flex flex-col items-center gap-6 md:gap-8"
         animate={initPhase === 'awakening' ? {
           x: [0, -3, 3, -2, 2, 0],
