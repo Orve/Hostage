@@ -3,11 +3,13 @@
 import { useState } from "react";
 import StasisChamber from "../../../components/StasisChamber";
 import CreatePetForm from "../../../components/CreatePetForm";
+import { getCharacterImageByStatus, DEFAULT_CHARACTER_TYPE } from "@/lib/characterAssets";
 
 /**
  * 開発用デモページ - CreatePetForm & StasisChamber
  * 
  * 認証なしでコンポーネントの動作確認が可能
+ * characterAssetsモジュールによる動的画像切り替えのデモ
  */
 export default function CreatePetDemo() {
   const [showForm, setShowForm] = useState(true);
@@ -53,7 +55,7 @@ export default function CreatePetDemo() {
           <div className="w-64 mx-auto">
             <StasisChamber
               hp={100}
-              imageSrc="/assets/status_normal.png"
+              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 100, 'ALIVE')}
               status="ALIVE"
             />
           </div>
@@ -90,7 +92,7 @@ export default function CreatePetDemo() {
           <div className="space-y-2">
             <StasisChamber
               hp={100}
-              imageSrc="/assets/unnamed.png"
+              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 100, 'UNINITIALIZED')}
               status="UNINITIALIZED"
             />
             <div className="text-[10px] text-center text-cyan-600 tracking-wider">
@@ -98,15 +100,39 @@ export default function CreatePetDemo() {
             </div>
           </div>
 
-          {/* ALIVE */}
+          {/* ALIVE (Healthy) */}
           <div className="space-y-2">
             <StasisChamber
               hp={100}
-              imageSrc="/assets/status_normal.png"
+              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 100, 'ALIVE')}
               status="ALIVE"
             />
             <div className="text-[10px] text-center text-emerald-500 tracking-wider">
-              ALIVE (100%)
+              HEALTHY (100%)
+            </div>
+          </div>
+
+          {/* ALIVE (Caution) */}
+          <div className="space-y-2">
+            <StasisChamber
+              hp={60}
+              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 60, 'ALIVE')}
+              status="ALIVE"
+            />
+            <div className="text-[10px] text-center text-yellow-500 tracking-wider">
+              CAUTION (60%)
+            </div>
+          </div>
+
+          {/* ALIVE (Danger) */}
+          <div className="space-y-2">
+            <StasisChamber
+              hp={30}
+              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 30, 'ALIVE')}
+              status="ALIVE"
+            />
+            <div className="text-[10px] text-center text-orange-500 tracking-wider">
+              DANGER (30%)
             </div>
           </div>
 
@@ -114,7 +140,7 @@ export default function CreatePetDemo() {
           <div className="space-y-2">
             <StasisChamber
               hp={15}
-              imageSrc="/assets/status_critical.png"
+              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 15, 'CRITICAL')}
               status="CRITICAL"
             />
             <div className="text-[10px] text-center text-red-500 tracking-wider">
@@ -126,7 +152,7 @@ export default function CreatePetDemo() {
           <div className="space-y-2">
             <StasisChamber
               hp={0}
-              imageSrc="/assets/status_critical.png"
+              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 0, 'DEAD')}
               status="DEAD"
             />
             <div className="text-[10px] text-center text-gray-500 tracking-wider">

@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import StasisChamber from './StasisChamber';
+import { getCharacterImageByStatus, DEFAULT_CHARACTER_TYPE } from '@/lib/characterAssets';
 
 /**
  * StasisChamber Demo Component
  *
  * 培養槽コンポーネントの使用例とテストページ
+ * characterAssetsモジュールによる動的画像切り替えのデモ
  */
 export default function StasisChamberDemo() {
   const [hp, setHp] = useState(80);
@@ -23,6 +25,11 @@ export default function StasisChamberDemo() {
       setStatus('ALIVE');
     }
   };
+
+  // HP・ステータスに応じて動的に画像を切り替え
+  const characterImage = useMemo(() => {
+    return getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, hp, status);
+  }, [hp, status]);
 
   return (
     <div className="min-h-screen bg-black p-8">
@@ -42,7 +49,7 @@ export default function StasisChamberDemo() {
             <StasisChamber
               hp={hp}
               maxHp={100}
-              imageSrc="/assets/unnamed.png"
+              imageSrc={characterImage}
               status={status}
             />
           </div>
@@ -78,8 +85,8 @@ export default function StasisChamberDemo() {
                   <button
                     onClick={() => setStatus('ALIVE')}
                     className={`px-3 py-2 text-xs font-mono rounded transition ${status === 'ALIVE'
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                       }`}
                   >
                     ALIVE
@@ -87,8 +94,8 @@ export default function StasisChamberDemo() {
                   <button
                     onClick={() => setStatus('CRITICAL')}
                     className={`px-3 py-2 text-xs font-mono rounded transition ${status === 'CRITICAL'
-                        ? 'bg-red-600 text-white'
-                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                      ? 'bg-red-600 text-white'
+                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                       }`}
                   >
                     CRITICAL
@@ -96,8 +103,8 @@ export default function StasisChamberDemo() {
                   <button
                     onClick={() => setStatus('DEAD')}
                     className={`px-3 py-2 text-xs font-mono rounded transition ${status === 'DEAD'
-                        ? 'bg-gray-600 text-white'
-                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                      ? 'bg-gray-600 text-white'
+                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                       }`}
                   >
                     DEAD
@@ -152,8 +159,8 @@ export default function StasisChamberDemo() {
                 <div className="flex justify-between">
                   <span className="text-gray-400">Fluid State:</span>
                   <span className={`${status === 'ALIVE' ? 'text-emerald-400' :
-                      status === 'CRITICAL' ? 'text-red-400' :
-                        'text-gray-400'
+                    status === 'CRITICAL' ? 'text-red-400' :
+                      'text-gray-400'
                     }`}>
                     {status === 'ALIVE' ? 'STABLE' :
                       status === 'CRITICAL' ? 'UNSTABLE' :
@@ -180,19 +187,19 @@ export default function StasisChamberDemo() {
             <StasisChamber
               hp={90}
               maxHp={100}
-              imageSrc="/assets/unnamed.png"
+              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 90, 'ALIVE')}
               status="ALIVE"
             />
             <StasisChamber
               hp={35}
               maxHp={100}
-              imageSrc="/assets/unnamed.png"
+              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 35, 'ALIVE')}
               status="ALIVE"
             />
             <StasisChamber
               hp={10}
               maxHp={100}
-              imageSrc="/assets/unnamed.png"
+              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 10, 'CRITICAL')}
               status="CRITICAL"
             />
           </div>

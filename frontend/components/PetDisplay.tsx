@@ -1,7 +1,8 @@
 "use client";
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import StasisChamber from './StasisChamber';
+import { getCharacterImageByStatus, DEFAULT_CHARACTER_TYPE } from '@/lib/characterAssets';
 
 interface PetProps {
   pet: {
@@ -18,6 +19,7 @@ interface PetProps {
  * 
  * StasisChamber（培養槽）をベースに、Demo のレイアウト要素を統合。
  * HPバー、ステータステキスト、グリッチエフェクトを含む。
+ * キャラクター画像はcharacterAssetsモジュールにより動的に切り替え。
  */
 export default function PetDisplay({ pet }: PetProps) {
   if (!pet) return <div className="text-gray-500">No Active Pet</div>;
@@ -42,12 +44,10 @@ export default function PetDisplay({ pet }: PetProps) {
     return "OPERATIONAL";
   };
 
-  // HP状態別の画像
-  const getCharacterImage = () => {
-    if (pet.hp >= 80) return "/assets/status_normal.png";
-    if (pet.hp >= 30) return "/assets/status_warning.png";
-    return "/assets/status_critical.png";
-  };
+  // HP状態別の画像（characterAssetsモジュールを使用）
+  const characterImage = useMemo(() => {
+    return getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, pet.hp, getStatus());
+  }, [pet.hp, pet.status]);
 
   return (
     <>
@@ -74,7 +74,7 @@ export default function PetDisplay({ pet }: PetProps) {
         <StasisChamber
           hp={pet.hp}
           maxHp={pet.max_hp}
-          imageSrc={getCharacterImage()}
+          imageSrc={characterImage}
           status={getStatus()}
           glowIntensity={isCritical ? 'high' : 'normal'}
         />
@@ -95,10 +95,10 @@ export default function PetDisplay({ pet }: PetProps) {
         <div className="h-6 md:h-8 w-full bg-gray-900 border border-gray-700 rounded p-[2px]">
           <div
             className={`h-full transition-all duration-500 rounded-sm ${isCritical
-                ? "bg-red-600 shadow-[0_0_15px_red]"
-                : isWarning
-                  ? "bg-yellow-500 shadow-[0_0_10px_yellow]"
-                  : "bg-emerald-500 shadow-[0_0_15px_green]"
+              ? "bg-red-600 shadow-[0_0_15px_red]"
+              : isWarning
+                ? "bg-yellow-500 shadow-[0_0_10px_yellow]"
+                : "bg-emerald-500 shadow-[0_0_15px_green]"
               }`}
             style={{ width: `${hpPercent}%` }}
           />

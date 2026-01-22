@@ -8,6 +8,7 @@ import { fetchPetStatus, Pet, syncNotion } from "../lib/api";
 import SystemError from "../components/SystemError";
 import CreatePetForm from "../components/CreatePetForm";
 import TaskManager from "../components/TaskManager";
+import HabitManager from "../components/HabitManager";
 import DashboardLayout from "../components/DashboardLayout";
 
 export default function Home() {
@@ -126,6 +127,9 @@ export default function Home() {
 
             {/* タスク管理 */}
             <TaskManager userId={user?.id || ""} onTaskComplete={refreshPetSilently} />
+
+            {/* 習慣管理 */}
+            <HabitManager userId={user?.id || ""} />
           </div>
         ) : (
           <CreatePetForm userId={user?.id || ""} onSuccess={loadData} />

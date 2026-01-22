@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // WSL環境: package.jsonでCHOKIDAR_USEPOLLING=trueを設定済み
 
+  // 🚨 開発用: リダイレクト無効化（本番前に戻すこと！）
   // 本番公開前の一時的なリダイレクト設定
   // ルートアクセスをデモページに飛ばし、本番機能への直接アクセスを防ぐ
   async redirects() {

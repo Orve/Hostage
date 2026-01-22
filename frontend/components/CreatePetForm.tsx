@@ -17,7 +17,14 @@ interface CreatePetFormProps {
  * 
  * 新規ユーザーがペットを作成するための没入感のあるフォーム。
  * StasisChamberと連携し、サイバーパンク・ホラーな雰囲気で演出。
- * Framer Motion による劇的な誕生シーケンスを実装。
+ * Framer Motion による劇的な5フェーズ誕生シーケンスを実装。
+ * 
+ * 5 Phases:
+ * 1. Boot - システム起動シーケンス
+ * 2. Chamber - 培養液充填エフェクト
+ * 3. Materialize - キャラクター出現アニメーション
+ * 4. Vitals - HPカウントアップ演出 (0 -> 100)
+ * 5. Complete - ダッシュボードへの遷移
  */
 export default function CreatePetForm({ userId, onSuccess, mockMode = false }: CreatePetFormProps) {
   const [petName, setPetName] = useState("");
@@ -27,8 +34,16 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
   // 入力フィールドにフォーカスしているかどうか
   const [isFocused, setIsFocused] = useState(false);
 
-  // 初期化シーケンス中の演出フェーズ
-  const [initPhase, setInitPhase] = useState<'idle' | 'initializing' | 'awakening' | 'complete'>('idle');
+  // 5フェーズ誕生シーケンス
+  const [birthPhase, setBirthPhase] = useState<
+    'idle' | 'boot' | 'chamber' | 'materialize' | 'vitals' | 'complete'
+  >('idle');
+
+  // 培養槽の状態（誕生シーケンス用）
+  const [fillLevel, setFillLevel] = useState(0);           // 培養液充填レベル (0-100)
+  const [characterVisible, setCharacterVisible] = useState(false); // キャラクター表示
+  const [characterOpacity, setCharacterOpacity] = useState(0);     // キャラクター透明度
+  const [displayHp, setDisplayHp] = useState(0);           // 表示用HP (0-100)
 
   // ターミナル風の起動メッセージ
   const [bootMessages, setBootMessages] = useState<string[]>([]);
@@ -74,72 +89,111 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
     }
   }, [bootMessages]);
 
-  // 心拍アニメーション（初期化中）
+  // 心拍アニメーション（誕生シーケンス中）
   useEffect(() => {
-    if (initPhase === 'initializing') {
+    if (birthPhase === 'chamber' || birthPhase === 'materialize') {
       // 徐々に心拍を強くする
       const interval = setInterval(() => {
         setHeartbeatIntensity(prev => Math.min(prev + 0.1, 1));
       }, 200);
       return () => clearInterval(interval);
-    } else if (initPhase === 'awakening') {
+    } else if (birthPhase === 'vitals') {
       setHeartbeatIntensity(1);
     } else {
       setHeartbeatIntensity(0);
     }
-  }, [initPhase]);
+  }, [birthPhase]);
 
   // 培養槽の発光強度を決定
   const glowIntensity = useCallback((): 'low' | 'normal' | 'high' => {
-    if (initPhase === 'initializing' || initPhase === 'awakening') {
+    if (birthPhase !== 'idle') {
       return 'high';
     }
     if (isFocused) {
       return 'high';
     }
     return 'normal';
-  }, [isFocused, initPhase]);
+  }, [isFocused, birthPhase]);
 
-  // 誕生シーケンスの実行
+  /**
+   * 5フェーズ誕生シーケンスの実行
+   * Phase 1: Boot - システム起動
+   * Phase 2: Chamber - 培養液充填
+   * Phase 3: Materialize - キャラクター出現
+   * Phase 4: Vitals - HPカウントアップ
+   * Phase 5: Complete - 完了・遷移
+   */
   const runBirthSequence = async () => {
-    // Phase 1: 初期化開始
-    setInitPhase('initializing');
+    // ===== Phase 1: BOOT =====
+    setBirthPhase('boot');
+    setBootMessages(prev => [...prev, "[ BOOT ] INITIATING_GENESIS_PROTOCOL..."]);
+    await new Promise(r => setTimeout(r, 300));
 
-    const initMessages = [
-      "[ INIT ] SEQUENCE_STARTED...",
-      "[ INIT ] VALIDATING_DESIGNATION...",
-      `[ INIT ] SUBJECT_ID: ${petName.trim().toUpperCase()}`,
-      "[ INIT ] ALLOCATING_CHAMBER_RESOURCES...",
-      "[ INIT ] SYNCING_BIOMETRICS...",
-      "[ INIT ] ESTABLISHING_NEURAL_LINK...",
+    const bootMsgs = [
+      "[ BOOT ] BIOS_CHECK: OK",
+      "[ BOOT ] MEMORY_ALLOCATED: 1024MB",
+      "[ BOOT ] NEURAL_CORE_ONLINE",
+      `[ BOOT ] SUBJECT_ID: ${petName.trim().toUpperCase()}`,
+      "[ BOOT ] CHAMBER_SYSTEMS_READY",
     ];
-
-    for (let i = 0; i < initMessages.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 400));
-      setBootMessages(prev => [...prev, initMessages[i]]);
+    for (const msg of bootMsgs) {
+      await new Promise(r => setTimeout(r, 250));
+      setBootMessages(prev => [...prev, msg]);
     }
 
-    // Phase 2: 覚醒シーケンス
-    setInitPhase('awakening');
+    // ===== Phase 2: CHAMBER (液体充填) =====
+    setBirthPhase('chamber');
+    setBootMessages(prev => [...prev, "[ CHAMBER ] INITIATING_FLUID_FILL..."]);
 
-    const awakeningMessages = [
-      "[ VITAL ] HEARTBEAT_DETECTED...",
-      "[ VITAL ] NEURAL_PATHWAYS_FORMING...",
-      "[ VITAL ] CONSCIOUSNESS_EMERGING...",
-    ];
+    // 液体を段階的に充填 (0% -> 100%)
+    for (let i = 0; i <= 100; i += 2) {
+      setFillLevel(i);
+      await new Promise(r => setTimeout(r, 25));
+    }
+    setBootMessages(prev => [...prev, "[ CHAMBER ] FLUID_LEVEL: 100%"]);
+    setBootMessages(prev => [...prev, "[ CHAMBER ] PRESSURE_STABILIZED"]);
+    await new Promise(r => setTimeout(r, 300));
 
-    for (const msg of awakeningMessages) {
-      await new Promise(resolve => setTimeout(resolve, 600));
-      setBootMessages(prev => [...prev, msg]);
+    // ===== Phase 3: MATERIALIZE (キャラクター出現) =====
+    setBirthPhase('materialize');
+    setBootMessages(prev => [...prev, "[ GENESIS ] MATERIALIZING_SUBJECT..."]);
+
+    // キャラクターをフェードイン
+    setCharacterVisible(true);
+    for (let i = 0; i <= 100; i += 5) {
+      setCharacterOpacity(i / 100);
+      await new Promise(r => setTimeout(r, 50));
     }
 
     // フラッシュエフェクト
     setShowFlash(true);
-    await new Promise(resolve => setTimeout(resolve, 150));
+    await new Promise(r => setTimeout(r, 100));
     setShowFlash(false);
-    await new Promise(resolve => setTimeout(resolve, 100));
+
+    setBootMessages(prev => [...prev, "[ GENESIS ] SUBJECT_MANIFESTED"]);
+    setBootMessages(prev => [...prev, "[ GENESIS ] NEURAL_LINK_ESTABLISHED"]);
+    await new Promise(r => setTimeout(r, 400));
+
+    // ===== Phase 4: VITALS (HPカウントアップ) =====
+    setBirthPhase('vitals');
+    setBootMessages(prev => [...prev, "[ VITAL ] INITIATING_LIFE_SIGNS..."]);
+
+    // HPを0から100へカウントアップ
+    for (let hp = 0; hp <= 100; hp += 1) {
+      setDisplayHp(hp);
+      await new Promise(r => setTimeout(r, 15));
+    }
+
+    setBootMessages(prev => [...prev, "[ VITAL ] HEARTBEAT: DETECTED"]);
+    setBootMessages(prev => [...prev, "[ VITAL ] HP: 100/100 - STABLE"]);
+
+    // 最終フラッシュ
     setShowFlash(true);
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(r => setTimeout(r, 150));
+    setShowFlash(false);
+    await new Promise(r => setTimeout(r, 100));
+    setShowFlash(true);
+    await new Promise(r => setTimeout(r, 100));
     setShowFlash(false);
   };
 
@@ -190,7 +244,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
       setBootMessages(prev => [...prev, "[ SUCCESS ] SUBJECT_INITIALIZED"]);
       setBootMessages(prev => [...prev, "[ SUCCESS ] LIFE_SIGNS_STABLE"]);
       setBootMessages(prev => [...prev, "[ SUCCESS ] REDIRECTING_TO_DASHBOARD..."]);
-      setInitPhase('complete');
+      setBirthPhase('complete');
 
       // 最終フラッシュ
       setShowFlash(true);
@@ -210,7 +264,12 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
       setError(errorMessage);
       setBootMessages(prev => [...prev, `[ FATAL ] ${errorMessage}`]);
       setBootMessages(prev => [...prev, "[ FATAL ] INITIALIZATION_SEQUENCE_ABORTED"]);
-      setInitPhase('idle');
+      setBirthPhase('idle');
+      // 誕生シーケンスの状態をリセット
+      setFillLevel(0);
+      setCharacterVisible(false);
+      setCharacterOpacity(0);
+      setDisplayHp(0);
       console.error("CreatePet Error:", err);
     } finally {
       setLoading(false);
@@ -249,8 +308,8 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
 
   // 培養槽のアニメーションステート
   const getChamberAnimation = () => {
-    if (initPhase === 'awakening') return 'intense';
-    if (initPhase === 'initializing') return 'beating';
+    if (birthPhase === 'materialize' || birthPhase === 'vitals') return 'intense';
+    if (birthPhase === 'boot' || birthPhase === 'chamber') return 'beating';
     return 'idle';
   };
 
@@ -269,9 +328,9 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
         )}
       </AnimatePresence>
 
-      {/* ========== ノイズオーバーレイ（初期化中） ========== */}
+      {/* ========== ノイズオーバーレイ（誕生シーケンス中） ========== */}
       <AnimatePresence>
-        {(initPhase === 'initializing' || initPhase === 'awakening') && (
+        {birthPhase !== 'idle' && birthPhase !== 'complete' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.1 + heartbeatIntensity * 0.15 }}
@@ -284,7 +343,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
       {/* メインコンテナ - モバイル対応でキーボード表示時にも崩れないように */}
       <motion.div
         className="flex flex-col items-center gap-6 md:gap-8"
-        animate={initPhase === 'awakening' ? {
+        animate={birthPhase === 'materialize' || birthPhase === 'vitals' ? {
           x: [0, -3, 3, -2, 2, 0],
           transition: { duration: 0.3, repeat: Infinity }
         } : {}}
@@ -297,10 +356,13 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
           animate={getChamberAnimation()}
         >
           <StasisChamber
-            hp={100}
+            hp={displayHp}
             imageSrc="/assets/unnamed.png"
-            status="UNINITIALIZED"
+            status={birthPhase === 'complete' ? 'ALIVE' : 'UNINITIALIZED'}
             glowIntensity={glowIntensity()}
+            fillLevel={fillLevel}
+            characterVisible={characterVisible}
+            characterOpacity={characterOpacity}
           />
         </motion.div>
 
@@ -308,7 +370,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
         <motion.div
           ref={terminalRef}
           className="w-full max-h-24 md:max-h-32 overflow-y-auto bg-black/80 border border-cyan-900/50 rounded p-2 font-mono text-[10px] md:text-xs"
-          animate={initPhase === 'awakening' ? {
+          animate={birthPhase === 'vitals' || birthPhase === 'materialize' ? {
             borderColor: ["rgba(6, 182, 212, 0.5)", "rgba(34, 211, 238, 0.8)", "rgba(6, 182, 212, 0.5)"],
             boxShadow: [
               "0 0 10px rgba(6, 182, 212, 0.3)",
@@ -329,6 +391,9 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
                 className={`
                   ${msg.includes('ERROR') || msg.includes('FATAL') ? 'text-red-500' : ''}
                   ${msg.includes('SUCCESS') ? 'text-emerald-400' : ''}
+                  ${msg.includes('BOOT') ? 'text-blue-400' : ''}
+                  ${msg.includes('CHAMBER') ? 'text-cyan-400' : ''}
+                  ${msg.includes('GENESIS') ? 'text-purple-400' : ''}
                   ${msg.includes('INIT') ? 'text-cyan-400' : ''}
                   ${msg.includes('SYSTEM') ? 'text-green-500' : ''}
                   ${msg.includes('VITAL') ? 'text-pink-400' : ''}
@@ -350,7 +415,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
         {/* ========== 入力フォーム ========== */}
         <motion.div
           className="w-full"
-          animate={initPhase === 'complete' ? {
+          animate={birthPhase === 'complete' ? {
             scale: [1, 1.02, 1],
             transition: { duration: 0.5 }
           } : {}}
@@ -364,7 +429,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
               <motion.h2
                 className="text-xl md:text-2xl font-black text-cyan-400 tracking-[0.15em] md:tracking-[0.2em] uppercase mb-1 glitch-text"
                 data-text="INITIALIZE"
-                animate={initPhase === 'awakening' ? {
+                animate={birthPhase === 'materialize' || birthPhase === 'vitals' ? {
                   textShadow: [
                     "0 0 10px rgba(34, 211, 238, 0.5)",
                     "0 0 30px rgba(34, 211, 238, 1)",
@@ -465,7 +530,10 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                       />
                       <span>
-                        {initPhase === 'awakening' ? 'AWAKENING...' : 'INITIALIZING...'}
+                        {birthPhase === 'vitals' ? 'AWAKENING...' :
+                          birthPhase === 'materialize' ? 'MATERIALIZING...' :
+                            birthPhase === 'chamber' ? 'FILLING...' :
+                              'INITIALIZING...'}
                       </span>
                     </>
                   ) : (

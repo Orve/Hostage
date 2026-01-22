@@ -356,8 +356,8 @@ export default function TaskManager({ userId, onTaskComplete }: TaskManagerProps
                     whileTap={{ scale: 0.9 }}
                     onClick={() => handleCompleteTask(task.id)}
                     className={`w-6 h-6 border rounded flex items-center justify-center transition-colors ${overdue
-                        ? 'border-red-500 hover:bg-red-900/50'
-                        : 'border-current hover:bg-current/20'
+                      ? 'border-red-500 hover:bg-red-900/50'
+                      : 'border-current hover:bg-current/20'
                       }`}
                   >
                     <span className="text-xs opacity-0 group-hover:opacity-100 transition-opacity">✓</span>
@@ -387,14 +387,12 @@ export default function TaskManager({ userId, onTaskComplete }: TaskManagerProps
                   </div>
 
                   {/* 削除ボタン */}
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                  <button
                     onClick={() => handleDeleteTask(task.id)}
-                    className="w-6 h-6 text-red-600 opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-400"
+                    className="w-8 h-8 text-red-600/60 hover:text-red-400 transition-colors flex items-center justify-center"
                   >
-                    ✕
-                  </motion.button>
+                    🗑
+                  </button>
                 </motion.div>
               );
             })}

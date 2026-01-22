@@ -177,3 +177,87 @@ export async function deleteTask(taskId: string): Promise<{ status: string; task
   return res.json();
 }
 
+// ========== 日次習慣管理API ==========
+
+export type DailyHabit = {
+  id: string;
+  user_id: string;
+  title: string;
+  streak: number;
+  last_completed_at: string | null;
+  created_at: string;
+};
+
+export type CreateDailyHabitRequest = {
+  user_id: string;
+  title: string;
+};
+
+export type DailyHabitListResponse = {
+  habits: DailyHabit[];
+  total: number;
+};
+
+export type DailyHabitCheckResponse = {
+  habit: DailyHabit;
+  action: string;
+  new_streak: number;
+  message: string;
+};
+
+/**
+ * ユーザーの日次習慣一覧を取得する
+ */
+export async function fetchDailyHabits(userId: string): Promise<DailyHabitListResponse> {
+  const res = await fetch(`${API_BASE}/daily-habits/${userId}`, { cache: "no-store" });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new APIError(res.status, errorData.detail || "Failed to fetch daily habits");
+  }
+  return res.json();
+}
+
+/**
+ * 日次習慣を作成する
+ */
+export async function createDailyHabit(habitData: CreateDailyHabitRequest): Promise<DailyHabit> {
+  const res = await fetch(`${API_BASE}/daily-habits/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(habitData),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new APIError(res.status, errorData.detail || "Failed to create daily habit");
+  }
+  return res.json();
+}
+
+/**
+ * 日次習慣の完了/未完了をトグルする
+ */
+export async function toggleDailyHabitCheck(habitId: string): Promise<DailyHabitCheckResponse> {
+  const res = await fetch(`${API_BASE}/daily-habits/${habitId}/check`, {
+    method: "PUT",
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new APIError(res.status, errorData.detail || "Failed to toggle daily habit");
+  }
+  return res.json();
+}
+
+/**
+ * 日次習慣を削除する
+ */
+export async function deleteDailyHabit(habitId: string): Promise<{ status: string; habit_id: string }> {
+  const res = await fetch(`${API_BASE}/daily-habits/${habitId}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new APIError(res.status, errorData.detail || "Failed to delete daily habit");
+  }
+  return res.json();
+}
+
