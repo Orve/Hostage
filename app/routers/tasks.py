@@ -330,7 +330,7 @@ def get_overdue_tasks(user_id: str):
     }
 
 
-@router.post("/cron/damage")
+@router.get("/cron/damage")
 def apply_daily_damage(
     x_api_key: str = Header(..., alias="X-API-KEY")
 ):
@@ -341,6 +341,8 @@ def apply_daily_damage(
     「タスクを片付けるまで、毎日枕元で囁かれ続ける」仕様。
     
     セキュリティ: X-API-KEY ヘッダーで認証
+    
+    注意: Vercel CronはGETリクエストを送信するため、GETで実装。
     """
     # セキュリティチェック
     expected_key = os.getenv("CRON_SECRET", "hostage_cron_secret_2026")
