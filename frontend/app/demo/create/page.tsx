@@ -3,7 +3,7 @@
 import { useState } from "react";
 import StasisChamber from "../../../components/StasisChamber";
 import CreatePetForm from "../../../components/CreatePetForm";
-import { getCharacterImageByStatus, DEFAULT_CHARACTER_TYPE } from "@/lib/characterAssets";
+import { getCharacterImageByStatus, DEFAULT_CHARACTER_TYPE, CharacterType } from "@/lib/characterAssets";
 
 /**
  * 開発用デモページ - CreatePetForm & StasisChamber
@@ -14,6 +14,7 @@ import { getCharacterImageByStatus, DEFAULT_CHARACTER_TYPE } from "@/lib/charact
 export default function CreatePetDemo() {
   const [showForm, setShowForm] = useState(true);
   const [demoStage, setDemoStage] = useState<'form' | 'success'>('form');
+  const [selectedCharacter, setSelectedCharacter] = useState<CharacterType>(DEFAULT_CHARACTER_TYPE);
 
   // 成功時のコールバック（デモ用）
   const handleSuccess = () => {
@@ -25,6 +26,7 @@ export default function CreatePetDemo() {
   const handleReset = () => {
     setDemoStage('form');
     setShowForm(true);
+    setSelectedCharacter(DEFAULT_CHARACTER_TYPE);
   };
 
   return (
@@ -45,6 +47,7 @@ export default function CreatePetDemo() {
           userId="demo-user-id"
           onSuccess={handleSuccess}
           mockMode={true}
+          onCharacterSelect={setSelectedCharacter}
         />
       )}
 
@@ -55,7 +58,7 @@ export default function CreatePetDemo() {
           <div className="w-64 mx-auto">
             <StasisChamber
               hp={100}
-              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 100, 'ALIVE')}
+              imageSrc={getCharacterImageByStatus(selectedCharacter, 100, 'ALIVE')}
               status="ALIVE"
             />
           </div>
@@ -88,23 +91,11 @@ export default function CreatePetDemo() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {/* UNINITIALIZED */}
-          <div className="space-y-2">
-            <StasisChamber
-              hp={100}
-              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 100, 'UNINITIALIZED')}
-              status="UNINITIALIZED"
-            />
-            <div className="text-[10px] text-center text-cyan-600 tracking-wider">
-              UNINITIALIZED
-            </div>
-          </div>
-
           {/* ALIVE (Healthy) */}
           <div className="space-y-2">
             <StasisChamber
               hp={100}
-              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 100, 'ALIVE')}
+              imageSrc={getCharacterImageByStatus(selectedCharacter, 100, 'ALIVE')}
               status="ALIVE"
             />
             <div className="text-[10px] text-center text-emerald-500 tracking-wider">
@@ -116,7 +107,7 @@ export default function CreatePetDemo() {
           <div className="space-y-2">
             <StasisChamber
               hp={60}
-              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 60, 'ALIVE')}
+              imageSrc={getCharacterImageByStatus(selectedCharacter, 60, 'ALIVE')}
               status="ALIVE"
             />
             <div className="text-[10px] text-center text-yellow-500 tracking-wider">
@@ -128,7 +119,7 @@ export default function CreatePetDemo() {
           <div className="space-y-2">
             <StasisChamber
               hp={30}
-              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 30, 'ALIVE')}
+              imageSrc={getCharacterImageByStatus(selectedCharacter, 30, 'ALIVE')}
               status="ALIVE"
             />
             <div className="text-[10px] text-center text-orange-500 tracking-wider">
@@ -140,23 +131,11 @@ export default function CreatePetDemo() {
           <div className="space-y-2">
             <StasisChamber
               hp={15}
-              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 15, 'CRITICAL')}
+              imageSrc={getCharacterImageByStatus(selectedCharacter, 15, 'CRITICAL')}
               status="CRITICAL"
             />
             <div className="text-[10px] text-center text-red-500 tracking-wider">
               CRITICAL (15%)
-            </div>
-          </div>
-
-          {/* DEAD */}
-          <div className="space-y-2">
-            <StasisChamber
-              hp={0}
-              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 0, 'DEAD')}
-              status="DEAD"
-            />
-            <div className="text-[10px] text-center text-gray-500 tracking-wider">
-              DEAD (0%)
             </div>
           </div>
         </div>

@@ -183,25 +183,50 @@ export default function StasisChamberDemo() {
           <h2 className="text-2xl font-bold text-cyan-400 mb-4 font-mono">
             MULTIPLE SUBJECTS
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <StasisChamber
-              hp={90}
-              maxHp={100}
-              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 90, 'ALIVE')}
-              status="ALIVE"
-            />
-            <StasisChamber
-              hp={35}
-              maxHp={100}
-              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 35, 'ALIVE')}
-              status="ALIVE"
-            />
-            <StasisChamber
-              hp={10}
-              maxHp={100}
-              imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 10, 'CRITICAL')}
-              status="CRITICAL"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* 1. HEALTHY */}
+            <div>
+              <div className="text-center text-xs font-mono text-emerald-500 mb-2">HEALTHY (100%)</div>
+              <StasisChamber
+                hp={100}
+                maxHp={100}
+                imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 100, 'ALIVE')}
+                status="ALIVE"
+              />
+            </div>
+
+            {/* 2. CAUTION */}
+            <div>
+              <div className="text-center text-xs font-mono text-yellow-500 mb-2">CAUTION (60%)</div>
+              <StasisChamber
+                hp={60}
+                maxHp={100}
+                imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 60, 'ALIVE')}
+                status="ALIVE"
+              />
+            </div>
+
+            {/* 3. DANGER */}
+            <div>
+              <div className="text-center text-xs font-mono text-orange-500 mb-2">DANGER (30%)</div>
+              <StasisChamber
+                hp={30}
+                maxHp={100}
+                imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 30, 'ALIVE')}
+                status="ALIVE"
+              />
+            </div>
+
+            {/* 4. CRITICAL */}
+            <div>
+              <div className="text-center text-xs font-mono text-red-500 mb-2">CRITICAL (10%)</div>
+              <StasisChamber
+                hp={10}
+                maxHp={100}
+                imageSrc={getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, 10, 'CRITICAL')}
+                status="CRITICAL"
+              />
+            </div>
           </div>
         </div>
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import PetDisplay from "../components/PetDisplay";
 import AuthGuard from "../components/AuthGuard";
 import { useAuth } from "../components/AuthProvider";
-import { fetchPetStatus, Pet, syncNotion } from "../lib/api";
+import { fetchPetStatus, Pet, syncNotion, revivePet } from "../lib/api";
 import SystemError from "../components/SystemError";
 import CreatePetForm from "../components/CreatePetForm";
 import TaskManager from "../components/TaskManager";
@@ -69,6 +69,21 @@ export default function Home() {
     }
   };
 
+  // 蘇生アクション
+  const handleRevive = async () => {
+    if (!pet?.id) return;
+    try {
+      setLoading(true);
+      await revivePet(pet.id);
+      await loadData(); // データをリロード
+    } catch (e) {
+      console.error(e);
+      setError("FAILED_TO_REVIVE_SUBJECT");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Show error state if data fetch failed
   if (error) {
     return (
@@ -106,7 +121,7 @@ export default function Home() {
           </div>
         ) : pet ? (
           <div className="w-full">
-            <PetDisplay pet={pet} />
+            <PetDisplay pet={pet} onRevive={handleRevive} />
 
             {/* Notion同期ボタン */}
             <div className="flex flex-col gap-3">

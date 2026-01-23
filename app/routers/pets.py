@@ -16,7 +16,8 @@ def create_pet(pet_in: PetCreate):
         "max_hp": 100.0,
         "infection_level": 0,
         "status": "ALIVE",
-        "last_checked_at": "now()" # Supabase側で処理、または文字列を渡す
+        "last_checked_at": "now()", # Supabase側で処理、または文字列を渡す
+        "character_type": pet_in.character_type
     }
     
     response = client.table("pets").insert(new_pet).execute()
@@ -42,3 +43,35 @@ def get_pet_status(user_id: str):
     current_state = calculate_time_decay(pet_data)
     
     return current_state
+
+
+@router.post("/{pet_id}/revive", response_model=PetResponse)
+def revive_pet(pet_id: str):
+    """
+    Pet Revival Protocol
+    - HP reset to 100
+    - Status set to ALIVE
+    - Infection level reset to 0
+    - Last interaction updated
+    """
+    # 現在のペットを確認
+    current_pet = client.table("pets").select("*").eq("id", pet_id).execute()
+    if not current_pet.data:
+        raise HTTPException(status_code=404, detail="Pet not found")
+
+    # 更新データ
+    revive_data = {
+        "status": "ALIVE",
+        "hp": 100.0,
+        "infection_level": 0,
+        "last_checked_at": "now()"
+    }
+
+    # DB更新
+    response = client.table("pets").update(revive_data).eq("id", pet_id).execute()
+
+    if not response.data:
+        raise HTTPException(status_code=500, detail="Failed to revive pet")
+
+    return response.data[0]
+

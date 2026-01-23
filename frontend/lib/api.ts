@@ -16,16 +16,35 @@ export type Pet = {
   hp: number;
   max_hp: number;
   status: 'ALIVE' | 'DEAD' | 'CRITICAL';
-  infection_level: number;
   born_at: string;
   last_checked_at: string;
+  character_type?: string; // Optional for backward compatibility, but backend sets default
 };
 
 export type CreatePetRequest = {
   user_id: string;
   name: string;
+  character_type: string;
 };
 
+// ... (Skip unrelated types)
+
+export async function createPet(petData: CreatePetRequest): Promise<Pet> {
+  const res = await fetch(`${API_BASE}/pets/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: petData.user_id,
+      name: petData.name,
+      character_type: petData.character_type,
+    }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new APIError(res.status, errorData.detail || "Failed to create pet");
+  }
+  return res.json();
+}
 export type Task = {
   id: string;
   user_id: string;
@@ -94,21 +113,19 @@ export async function syncNotion(userId: string) {
   return res.json();
 }
 
-export async function createPet(petData: CreatePetRequest): Promise<Pet> {
-  const res = await fetch(`${API_BASE}/pets/`, {
+
+
+export async function revivePet(petId: string): Promise<Pet> {
+  const res = await fetch(`${API_BASE}/pets/${petId}/revive`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      user_id: petData.user_id,
-      name: petData.name,
-    }),
   });
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new APIError(res.status, errorData.detail || "Failed to create pet");
+    throw new APIError(res.status, errorData.detail || "Failed to revive pet");
   }
   return res.json();
 }
+
 
 // ========== タスク管理API ==========
 

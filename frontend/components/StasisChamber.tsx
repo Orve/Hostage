@@ -1,12 +1,14 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
+import DeathOverlay from './DeathOverlay';
 
 type StasisChamberProps = {
   hp: number;
   maxHp?: number;
   imageSrc: string;
   status: 'ALIVE' | 'DEAD' | 'CRITICAL' | 'UNINITIALIZED';
+  onRevive?: () => void; // 蘇生アクション用コールバック
   // インタラクション用のオプション
   glowIntensity?: 'low' | 'normal' | 'high';
   // 誕生シーケンス用のオプション
@@ -112,6 +114,7 @@ export default function StasisChamber({
   fillLevel = 100,
   characterVisible = true,
   characterOpacity = 1,
+  onRevive,
 }: StasisChamberProps) {
   // HP比率を計算
   const hpRatio = Math.max(0, Math.min(100, (hp / maxHp) * 100));
@@ -308,13 +311,9 @@ export default function StasisChamber({
           </>
         )}
 
-        {/* 死亡時のオーバーレイ */}
+        {/* 死亡時のオーバーレイ (Revival Protocol) */}
         {status === 'DEAD' && (
-          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-            <div className="text-red-500 text-4xl font-bold tracking-wider animate-pulse">
-              ✝ DECEASED ✝
-            </div>
-          </div>
+          <DeathOverlay onRevive={onRevive || (() => { })} />
         )}
 
         {/* 培養槽のフレーム装飾 */}
