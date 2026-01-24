@@ -71,7 +71,6 @@ export const config = {
      * - demo (demo page)
      * Feel free to modify this pattern to include more paths.
      */
-    // 🚨 開発用: 一時的にmatcherを無効化（本番前に元に戻すこと！）
-    // '/((?!_next/static|_next/image|favicon.ico|stasis|demo|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|stasis|demo|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
