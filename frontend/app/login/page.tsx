@@ -14,8 +14,13 @@ function LoginPageContent() {
 
   useEffect(() => {
     const errorParam = searchParams.get("error");
+    const detailsParam = searchParams.get("details");
     if (errorParam) {
-      setError(decodeURIComponent(errorParam));
+      const errorMessage = detailsParam
+        ? `${errorParam}: ${decodeURIComponent(detailsParam)}`
+        : decodeURIComponent(errorParam);
+      setError(errorMessage);
+      console.error('[Login Page] Auth error:', { errorParam, detailsParam });
     }
   }, [searchParams]);
 

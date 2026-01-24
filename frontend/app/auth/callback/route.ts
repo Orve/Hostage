@@ -11,11 +11,25 @@ export async function GET(request: Request) {
   // Vercel等のプロキシ環境下で http と誤認されるのを防ぐ
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || requestUrl.origin;
 
+  console.log('[Auth Callback] Request received:', {
+    url: request.url,
+    code: code ? `${code.substring(0, 10)}...` : null,
+    next,
+    siteUrl,
+    origin: requestUrl.origin,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+  });
+
   if (code) {
     const cookieStore = await cookies()
+
+    // 環境変数から改行や空白を除去（念のため）
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\s+/g, '') || '';
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.replace(/\s+/g, '') || '';
+
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      supabaseUrl,
+      supabaseAnonKey,
       {
         cookies: {
           get(name: string) {
@@ -46,10 +60,16 @@ export async function GET(request: Request) {
       // siteUrl が末尾スラッシュを持つか確認して結合
       const baseUrl = siteUrl.replace(/\/$/, '');
       const redirectPath = next.startsWith('/') ? next : `/${next}`;
+      console.log('[Auth Callback] Success! Redirecting to:', `${baseUrl}${redirectPath}`);
       return NextResponse.redirect(`${baseUrl}${redirectPath}`)
     }
 
-    console.error('OAuth callback code exchange error:', error)
+    console.error('[Auth Callback] Code exchange error:', {
+      error,
+      errorMessage: error.message,
+      errorName: error.name,
+      errorStatus: (error as any).status,
+    });
     // エラー詳細をクエリパラメータに含める
     return NextResponse.redirect(`${siteUrl}/login?error=auth_code_error&details=${encodeURIComponent(error.message)}`)
   }
