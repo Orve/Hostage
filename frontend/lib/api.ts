@@ -81,13 +81,34 @@ export type TaskCompleteResponse = {
   message: string;
 };
 
-export async function fetchPetStatus(userId: string) {
-  const res = await fetch(`${API_BASE}/pets/${userId}`, { cache: "no-store" });
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new APIError(res.status, errorData.detail || "Failed to fetch pet status");
+export async function fetchPetStatus(userId: string): Promise<Pet | null> {
+  const url = `${API_BASE}/pets/${userId}`;
+  console.log('[API] Fetching pet status:', { url, userId, API_BASE });
+
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    console.log('[API] Response status:', res.status);
+
+    // 404の場合はペットが存在しないので null を返す（エラーではない）
+    if (res.status === 404) {
+      console.log('[API] Pet not found (404) - returning null');
+      return null;
+    }
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage = errorData.detail || `Failed to fetch pet status (${res.status})`;
+      console.error('[API] Error response:', errorData);
+      throw new APIError(res.status, errorMessage);
+    }
+    const data = await res.json();
+    console.log('[API] Pet data received:', data);
+    return data;
+  } catch (error) {
+    if (error instanceof APIError) throw error;
+    console.error('[API] Network or parsing error:', error);
+    throw new APIError(0, `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-  return res.json();
 }
 
 export async function completeHabit(habitId: string) {
