@@ -9,10 +9,10 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // 🚨 開発用: 自動リダイレクト無効化（本番前に戻すこと！）
-    // if (!loading && !user) {
-    //   router.push("/login");
-    // }
+    // 認証チェック
+    if (!loading && !user) {
+      router.push("/login");
+    }
   }, [user, loading, router]);
 
   // Show loading state with horror aesthetic
@@ -32,10 +32,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   // Redirect to login if not authenticated
-  // 🚨 開発用: 未認証でも画面を表示（本番前に戻すこと！）
-  // if (!user) {
-  //   return null;
-  // }
+  if (!user) {
+    return null;
+  }
 
   return <>{children}</>;
 }
