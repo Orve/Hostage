@@ -16,6 +16,7 @@ export type Pet = {
   hp: number;
   max_hp: number;
   status: 'ALIVE' | 'DEAD' | 'CRITICAL';
+  infection_level: number; // 復活
   born_at: string;
   last_checked_at: string;
   character_type?: string; // Optional for backward compatibility, but backend sets default
