@@ -6,6 +6,7 @@ from uuid import UUID
 # --- ペットモデル ---
 class PetBase(BaseModel):
     name: str = Field(..., max_length=50)
+    character_type: str = "cyber-fairy"
 
 class PetCreate(PetBase):
     user_id: UUID
@@ -19,6 +20,7 @@ class PetResponse(PetBase):
     status: Literal['ALIVE', 'DEAD']
     last_checked_at: datetime
     born_at: datetime
+    character_type: str
 
 # --- 習慣モデル ---
 class HabitCreate(BaseModel):

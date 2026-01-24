@@ -4,13 +4,46 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPet } from "../lib/api";
 import StasisChamber from "./StasisChamber";
+import { getCharacterImagePath, CharacterType, DEFAULT_CHARACTER_TYPE } from "../lib/characterAssets";
 
 interface CreatePetFormProps {
   userId: string;
   onSuccess: () => void;
   /** デモ用: trueの場合はAPIを呼ばずに疑似成功する */
   mockMode?: boolean;
+  /** キャラクター選択時のコールバック（プレビュー連携用） */
+  onCharacterSelect?: (type: CharacterType) => void;
 }
+
+// キャラクター定義
+const AVAILABLE_CHARACTERS: {
+  id: CharacterType;
+  label: string;
+  desc: string;
+  stats: { label: string; value: number; color: string }[];
+}[] = [
+    {
+      id: 'cyber-fairy',
+      label: 'TYPE-A: FAIRY',
+      desc: 'Digital construct. Sensitive to neglect.',
+      stats: [
+        { label: 'STABILITY', value: 90, color: 'bg-emerald-500' },
+        { label: 'RESILIENCE', value: 40, color: 'bg-cyan-500' },
+        { label: 'SYNC_RATE', value: 85, color: 'bg-purple-500' },
+      ]
+    },
+    {
+      id: 'bio-mutant',
+      label: 'TYPE-B: POLYP',
+      desc: 'Deep sea organism. High corruption risk.',
+      stats: [
+        { label: 'STABILITY', value: 30, color: 'bg-yellow-500' },
+        { label: 'RESILIENCE', value: 95, color: 'bg-red-500' },
+        { label: 'SYNC_RATE', value: 45, color: 'bg-orange-500' },
+      ]
+    },
+    // { id: 'synth-android', label: 'TYPE-C: SYNTH', desc: 'COMING SOON...' }, // 実装待ち
+  ];
 
 /**
  * CreatePetForm - 被験体初期化コンソール
@@ -18,18 +51,20 @@ interface CreatePetFormProps {
  * 新規ユーザーがペットを作成するための没入感のあるフォーム。
  * StasisChamberと連携し、サイバーパンク・ホラーな雰囲気で演出。
  * Framer Motion による劇的な5フェーズ誕生シーケンスを実装。
- * 
- * 5 Phases:
- * 1. Boot - システム起動シーケンス
- * 2. Chamber - 培養液充填エフェクト
- * 3. Materialize - キャラクター出現アニメーション
- * 4. Vitals - HPカウントアップ演出 (0 -> 100)
- * 5. Complete - ダッシュボードへの遷移
  */
-export default function CreatePetForm({ userId, onSuccess, mockMode = false }: CreatePetFormProps) {
+export default function CreatePetForm({ userId, onSuccess, mockMode = false, onCharacterSelect }: CreatePetFormProps) {
   const [petName, setPetName] = useState("");
+  const [selectedCharacter, setSelectedCharacter] = useState<CharacterType>(DEFAULT_CHARACTER_TYPE);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // キャラクター変更ラッパー
+  const handleCharacterChange = (type: CharacterType) => {
+    setSelectedCharacter(type);
+    if (onCharacterSelect) {
+      onCharacterSelect(type);
+    }
+  };
 
   // 入力フィールドにフォーカスしているかどうか
   const [isFocused, setIsFocused] = useState(false);
@@ -117,11 +152,6 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
 
   /**
    * 5フェーズ誕生シーケンスの実行
-   * Phase 1: Boot - システム起動
-   * Phase 2: Chamber - 培養液充填
-   * Phase 3: Materialize - キャラクター出現
-   * Phase 4: Vitals - HPカウントアップ
-   * Phase 5: Complete - 完了・遷移
    */
   const runBirthSequence = async () => {
     // ===== Phase 1: BOOT =====
@@ -237,6 +267,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
         await createPet({
           user_id: userId,
           name: petName.trim(),
+          character_type: selectedCharacter,
         });
       }
 
@@ -357,7 +388,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
         >
           <StasisChamber
             hp={displayHp}
-            imageSrc="/assets/unnamed.png"
+            imageSrc={getCharacterImagePath(selectedCharacter, 'healthy')}
             status={birthPhase === 'complete' ? 'ALIVE' : 'UNINITIALIZED'}
             glowIntensity={glowIntensity()}
             fillLevel={fillLevel}
@@ -447,6 +478,94 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false }: C
 
             {/* フォーム */}
             <form onSubmit={handleSubmit} className="relative z-10 space-y-4 md:space-y-5">
+
+              {/* キャラクター選択グリッド */}
+              <div>
+                <label className="block text-[10px] md:text-xs text-cyan-500 tracking-[0.15em] md:tracking-[0.2em] uppercase mb-2 font-mono">
+                  SELECT_GENOTYPE:
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {AVAILABLE_CHARACTERS.map((char) => (
+                    <button
+                      key={char.id}
+                      type="button"
+                      onClick={() => handleCharacterChange(char.id)}
+                      disabled={loading}
+                      className={`
+                        relative p-2 border transition-all duration-300 group
+                        flex flex-col items-center gap-2
+                        ${selectedCharacter === char.id
+                          ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_10px_rgba(34,211,238,0.3)]'
+                          : 'border-cyan-900/50 bg-black hover:border-cyan-700 hover:bg-cyan-900/10'}
+                      `}
+                    >
+                      {/* サムネイル (簡易表示) */}
+                      <div className="w-8 h-8 md:w-10 md:h-10 relative overflow-hidden rounded-full border border-cyan-800">
+                        <img
+                          src={getCharacterImagePath(char.id, 'healthy')}
+                          alt={char.label}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      <div className="text-[8px] md:text-[9px] tracking-wider uppercase text-cyan-300 font-mono">
+                        {char.label.split(': ')[1]}
+                      </div>
+
+                      {/* Selection Marker */}
+                      {selectedCharacter === char.id && (
+                        <motion.div
+                          layoutId="selection-marker"
+                          className="absolute inset-0 border-2 border-cyan-400 pointer-events-none"
+                        />
+                      )}
+                    </button>
+                  ))}
+
+                  {/* Coming Soon Placeholder (3つ目のスロット埋め) */}
+                  <div className="border border-cyan-900/30 bg-black/50 p-2 flex flex-col items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border border-cyan-900/50 bg-cyan-950/30 flex items-center justify-center text-cyan-900 font-mono text-xs">?</div>
+                    <div className="text-[8px] tracking-wider uppercase text-cyan-900 font-mono">LOCKED</div>
+                  </div>
+                </div>
+
+                {/* ステータスプレビューエリア */}
+                <div className="mt-4 border-t border-cyan-900/30 pt-3">
+                  {AVAILABLE_CHARACTERS.map((char) => (
+                    char.id === selectedCharacter && (
+                      <motion.div
+                        key={char.id}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-3"
+                      >
+                        <div className="text-[10px] text-cyan-400 font-mono text-center tracking-widest uppercase mb-2">
+                          &gt;&gt; SPEC: {char.desc}
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-2">
+                          {char.stats.map((stat, i) => (
+                            <div key={i} className="flex items-center gap-2">
+                              <div className="w-20 text-[9px] text-cyan-600 font-bold tracking-widest">{stat.label}</div>
+                              <div className="flex-1 h-1.5 bg-cyan-950/50 overflow-hidden relative">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${stat.value}%` }}
+                                  transition={{ duration: 0.8, delay: i * 0.1, type: "spring" }}
+                                  className={`h-full ${stat.color} shadow-[0_0_5px_currentColor]`}
+                                />
+                              </div>
+                              <div className="w-8 text-[9px] text-right font-mono text-cyan-500">{stat.value}%</div>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )
+                  ))}
+                </div>
+              </div>
+
               {/* 入力フィールド */}
               <div>
                 <label

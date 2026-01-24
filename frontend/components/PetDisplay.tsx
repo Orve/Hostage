@@ -11,7 +11,10 @@ interface PetProps {
     max_hp: number;
     status: 'ALIVE' | 'DEAD' | 'CRITICAL';
     infection_level: number;
+    id: string; // IDを追加（API呼び出しに必要）
+    character_type?: string; // キャラクタータイプ
   } | null;
+  onRevive?: () => void; // 親から蘇生関数を受け取る
 }
 
 /**
@@ -21,7 +24,7 @@ interface PetProps {
  * HPバー、ステータステキスト、グリッチエフェクトを含む。
  * キャラクター画像はcharacterAssetsモジュールにより動的に切り替え。
  */
-export default function PetDisplay({ pet }: PetProps) {
+export default function PetDisplay({ pet, onRevive }: PetProps) {
   if (!pet) return <div className="text-gray-500">No Active Pet</div>;
 
   const hpPercent = (pet.hp / pet.max_hp) * 100;
@@ -46,8 +49,9 @@ export default function PetDisplay({ pet }: PetProps) {
 
   // HP状態別の画像（characterAssetsモジュールを使用）
   const characterImage = useMemo(() => {
-    return getCharacterImageByStatus(DEFAULT_CHARACTER_TYPE, pet.hp, getStatus());
-  }, [pet.hp, pet.status]);
+    const charType = (pet.character_type as any) || DEFAULT_CHARACTER_TYPE;
+    return getCharacterImageByStatus(charType, pet.hp, getStatus());
+  }, [pet.hp, pet.status, pet.character_type]);
 
   return (
     <>
@@ -77,6 +81,7 @@ export default function PetDisplay({ pet }: PetProps) {
           imageSrc={characterImage}
           status={getStatus()}
           glowIntensity={isCritical ? 'high' : 'normal'}
+          onRevive={onRevive}
         />
       </div>
 
