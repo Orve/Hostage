@@ -320,20 +320,20 @@ export default function StasisChamber({
           </>
         )}
 
-        {/* 死亡時のオーバーレイ (Revival Protocol) */}
-        {status === 'DEAD' && (
-          <DeathOverlay
-            onRevive={onRevive || (() => { })}
-            onPurge={onPurge}
-          />
-        )}
-
         {/* 培養槽のフレーム装飾 */}
         <div className={`absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent ${decayStage === 'critical' ? 'via-red-500' : 'via-cyan-500'} to-transparent opacity-50 transition-colors duration-1000`} />
         <div className={`absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent ${decayStage === 'critical' ? 'via-red-500' : 'via-cyan-500'} to-transparent opacity-50 transition-colors duration-1000`} />
         <div className={`absolute top-0 bottom-0 left-0 w-px bg-gradient-to-b from-transparent ${decayStage === 'critical' ? 'via-red-500' : 'via-cyan-500'} to-transparent opacity-50 transition-colors duration-1000`} />
         <div className={`absolute top-0 bottom-0 right-0 w-px bg-gradient-to-b from-transparent ${decayStage === 'critical' ? 'via-red-500' : 'via-cyan-500'} to-transparent opacity-50 transition-colors duration-1000`} />
       </div>
+
+      {/* ========== Layer 4: INTERFACE (Death Overlay / Interactive) ========== */}
+      {status === 'DEAD' && (
+        <DeathOverlay
+          onRevive={onRevive || (() => { })}
+          onPurge={onPurge}
+        />
+      )}
 
       {/* ========== ステータス表示 ========== */}
       <div className={`absolute top-2 left-2 text-xs font-mono bg-black/60 px-2 py-1 rounded border backdrop-blur-sm transition-colors duration-1000 ${decayStage === 'critical' ? 'text-red-400 border-red-500/50' :
