@@ -306,7 +306,7 @@ export const dict = {
     },
     sync_notion: {
       en: 'SYNC_NOTION',
-      ja: '外部記憶同期',
+      ja: 'Notionと同期する',
     },
     syncing: {
       en: 'SYNCING...',

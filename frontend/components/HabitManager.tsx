@@ -13,6 +13,7 @@ import { useTranslation } from "@/lib/i18n/LanguageContext";
 
 interface HabitManagerProps {
   userId: string;
+  onHabitComplete?: () => void; // ペットの状態を更新するためのコールバック
 }
 
 /**
@@ -22,7 +23,7 @@ interface HabitManagerProps {
  * サイバーパンク・ホラーな雰囲気を維持しつつ、
  * 炎アイコンでストリークを強調表示する。
  */
-export default function HabitManager({ userId }: HabitManagerProps) {
+export default function HabitManager({ userId, onHabitComplete }: HabitManagerProps) {
   const { t, locale } = useTranslation();
   const [habits, setHabits] = useState<DailyHabit[]>([]);
   const [loading, setLoading] = useState(true);
@@ -153,17 +154,6 @@ export default function HabitManager({ userId }: HabitManagerProps) {
       })
     );
 
-    // ストリークメッセージを表示
-    if (!wasCompleted) {
-      const newStreak = targetHabit.streak + 1;
-      setStreakMessage(
-        newStreak > 1
-          ? `🔥 ${newStreak}${t('habit.streak_message')}`
-          : `✓ ${t('habit.completed')}`
-      );
-      setTimeout(() => setStreakMessage(null), 2000);
-    }
-
     // バックグラウンドでAPI呼び出し
     try {
       const response = await toggleDailyHabitCheck(habitId);
@@ -172,6 +162,24 @@ export default function HabitManager({ userId }: HabitManagerProps) {
       setHabits((prev) =>
         prev.map((h) => (h.id === habitId ? response.habit : h))
       );
+
+      // 完了時のメッセージ表示
+      if (response.action === "checked") {
+        // HP回復情報を含むメッセージ
+        const healInfo = response.healed > 0 ? ` +${response.healed} HP` : "";
+        const newStreak = response.new_streak;
+        setStreakMessage(
+          newStreak > 1
+            ? `🔥 ${newStreak}${t('habit.streak_message')}${healInfo}`
+            : `✓ ${t('habit.completed')}${healInfo}`
+        );
+        setTimeout(() => setStreakMessage(null), 2000);
+
+        // ペットの状態を更新
+        if (response.healed > 0 && onHabitComplete) {
+          onHabitComplete();
+        }
+      }
     } catch (e) {
       // 失敗: ロールバック
       console.error("Failed to toggle habit:", e);

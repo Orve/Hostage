@@ -14,6 +14,7 @@ from app.models.daily_habit import (
     DailyHabitCheckResponse
 )
 from app.services.supabase import client
+from app.services.game_logic import calculate_time_decay
 
 router = APIRouter(prefix="/daily-habits", tags=["daily-habits"])
 
@@ -154,19 +155,21 @@ def toggle_habit_check(habit_id: str):
             last_completed = None
     
     # --- トグルロジック ---
+    healed_amount = 0.0
+
     if last_completed and is_same_day(last_completed, now):
         # 今日すでに完了 → キャンセル処理
         new_streak = max(0, current_streak - 1)
-        
+
         # last_completed_at を戻す（前日があれば前日、なければnull）
         # 簡略化: 今回はnullに戻す（厳密な履歴管理は別途テーブルが必要）
         new_last_completed = None
-        
+
         update_data = {
             "streak": new_streak,
             "last_completed_at": new_last_completed
         }
-        
+
         action = "unchecked"
         message = f"習慣をキャンセルしました。ストリーク: {new_streak}日"
     else:
@@ -177,31 +180,62 @@ def toggle_habit_check(habit_id: str):
         else:
             # 連続途切れ or 初完了 → ストリークリセット
             new_streak = 1
-        
+
         update_data = {
             "streak": new_streak,
             "last_completed_at": now.isoformat()
         }
-        
+
         action = "checked"
         message = f"🔥 {new_streak}日連続達成！" if new_streak > 1 else "習慣を完了しました！"
-    
+
+        # HP回復処理（完了時のみ）
+        user_id = habit["user_id"]
+
+        # ユーザーのアクティブなペットを取得
+        pet_res = client.table("pets").select("*").eq("user_id", user_id).eq("status", "ALIVE").execute()
+
+        if pet_res.data:
+            pet_data = pet_res.data[0]
+
+            # 減衰を適用
+            decayed_pet = calculate_time_decay(pet_data)
+
+            # 習慣完了による回復量（固定）
+            heal_amount = 5.0
+
+            # 回復を適用
+            if decayed_pet['status'] == 'ALIVE':
+                new_hp = min(float(decayed_pet['max_hp']), decayed_pet['hp'] + heal_amount)
+                decayed_pet['hp'] = new_hp
+                healed_amount = heal_amount
+
+            # ペットを更新
+            pet_update = {
+                "hp": decayed_pet['hp'],
+                "status": decayed_pet['status'],
+                "last_checked_at": datetime.now(timezone.utc).isoformat()
+            }
+
+            client.table("pets").update(pet_update).eq("id", pet_data['id']).execute()
+
     # DB更新
     update_res = client.table("daily_habits")\
         .update(update_data)\
         .eq("id", habit_id)\
         .execute()
-    
+
     if not update_res.data:
         raise HTTPException(status_code=500, detail="Failed to update daily habit")
-    
+
     updated_habit = update_res.data[0]
-    
+
     return {
         "habit": updated_habit,
         "action": action,
         "new_streak": new_streak,
-        "message": message
+        "message": message,
+        "healed": healed_amount
     }
 
 
