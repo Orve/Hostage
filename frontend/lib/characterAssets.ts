@@ -12,7 +12,7 @@ export type CharacterHealthState = 'healthy' | 'caution' | 'danger' | 'dead';
  * キャラクタータイプの定義
  * 将来的に新キャラクターを追加する際はここに追加
  */
-export type CharacterType = 'cyber-fairy' | 'bio-mutant'; // synth-android removed temporarily
+export type CharacterType = 'cyber-fairy' | 'bio-mutant' | 'void-geometry'; // synth-android removed temporarily
 
 /**
  * HP閾値の設定
@@ -41,7 +41,16 @@ export function getCharacterImagePath(
   characterType: CharacterType,
   status: CharacterHealthState
 ): string {
-  // フォルダ構成: /assets/[type]/[status].png
+  // Void Geometry uses a different path structure
+  if (characterType === 'void-geometry') {
+    // Map status generic names to file specific names
+    const fileSuffix = status === 'healthy' ? 'health'
+      : status === 'dead' ? 'dead'
+        : status; // caution, danger
+    return `/assets/pets/void/void_${fileSuffix}.png`;
+  }
+
+  // Standard folder structure: /assets/characters/[type]/[status].png
   return `/assets/characters/${characterType}/${status}.png`;
 }
 
