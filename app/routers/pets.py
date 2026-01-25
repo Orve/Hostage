@@ -40,15 +40,21 @@ def create_pet(pet_in: PetCreate):
 
 @router.get("/{user_id}", response_model=PetResponse)
 def get_pet_status(user_id: str):
-    # ペット取得
+    # ペット取得 (修正: DEADなペットも取得して表示する)
+    # まずALIVEなペットを探す
     response = client.table("pets").select("*").eq("user_id", user_id).eq("status", "ALIVE").execute()
     
-    if not response.data:
-        # 死んだペットがいるかチェック？ または単に404を返す
-        # MVPではユーザーにつきアクティブなペットは1匹と仮定
-        raise HTTPException(status_code=404, detail="Active pet not found")
-        
-    pet_data = response.data[0]
+    pet_data = None
+    if response.data:
+        pet_data = response.data[0]
+    else:
+        # ALIVEがいなければ、最新のDEADなペットを探す (The Missing Corpse Fix)
+        dead_res = client.table("pets").select("*").eq("user_id", user_id).eq("status", "DEAD").order("created_at", desc=True).limit(1).execute()
+        if dead_res.data:
+            pet_data = dead_res.data[0]
+        else:
+            # 本当に何もいない場合のみ404
+            raise HTTPException(status_code=404, detail="Active pet not found")
     
     # 減衰状態の計算（非永続）
     current_state = calculate_time_decay(pet_data)
@@ -85,4 +91,15 @@ def revive_pet(pet_id: str):
         raise HTTPException(status_code=500, detail="Failed to revive pet")
 
     return response.data[0]
+
+
+@router.delete("/me", status_code=204)
+def purge_mypet(user_id: str):
+    """
+    [Purge Protocol]
+    Deletes the user's pet data permanently.
+    This allows the user to start over with a new specimen.
+    """
+    client.table("pets").delete().eq("user_id", user_id).execute()
+    return None
 

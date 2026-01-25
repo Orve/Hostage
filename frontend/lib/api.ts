@@ -167,6 +167,15 @@ export async function revivePet(petId: string): Promise<Pet> {
 
 // ========== タスク管理API ==========
 
+export async function deletePet(userId: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/pets/me?user_id=${userId}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    throw new APIError(res.status, "Failed to purge pet data");
+  }
+}
+
 /**
  * タスクを作成する
  */

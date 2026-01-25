@@ -20,6 +20,10 @@ def sync_and_punish(user_id: str = Query(..., description="User ID to apply sync
         return {"status": "No Active Pet"}
     
     pet = pet_res.data[0]
+    
+    # 既に死んでいるなら何もしない (死体蹴り防止)
+    if pet['status'] == 'DEAD':
+        return {"status": "Pet is already dead", "pet_name": pet['name']}
 
     # 2. 期限切れタスクの数を数える
     now_iso = datetime.now(timezone.utc).isoformat()

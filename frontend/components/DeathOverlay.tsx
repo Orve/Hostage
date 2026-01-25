@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 type DeathOverlayProps = {
   onRevive: () => void;
+  onPurge?: () => void;
 };
 
 type SequenceState = 'idle' | 'blackout' | 'booting';
@@ -20,7 +21,7 @@ const BOOT_LOGS = [
   "> VITAL_SIGNS_RESTORED."
 ];
 
-export default function DeathOverlay({ onRevive }: DeathOverlayProps) {
+export default function DeathOverlay({ onRevive, onPurge }: DeathOverlayProps) {
   const [sequenceState, setSequenceState] = useState<SequenceState>('idle');
   const [logIndex, setLogIndex] = useState(0);
 
@@ -97,9 +98,21 @@ export default function DeathOverlay({ onRevive }: DeathOverlayProps) {
               <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-red-500" />
             </button>
 
-            <div className="text-red-900/60 font-mono text-[10px] mt-2 animate-pulse">
+            <div className="text-red-900/60 font-mono text-[10px] mt-2 mb-8 animate-pulse">
               COST: 0.1 SOL (TESTNET)
             </div>
+
+            {/* PURGE OPTION (Secondary Action) */}
+            <button
+              onClick={() => {
+                if (confirm("⚠️ WARNING: PURGE PROTOCOL INITIATED ⚠️\n\nAll genetic data will be permanently erased.\nThis action cannot be undone.\n\nProceed?")) {
+                  onPurge && onPurge();
+                }
+              }}
+              className="text-[10px] text-red-900/50 hover:text-red-500 hover:bg-red-950/30 px-3 py-1 border border-transparent hover:border-red-900/30 transition-all font-mono tracking-widest uppercase"
+            >
+              [ PURGE_SAMPLE_DATA ]
+            </button>
           </motion.div>
         )}
 

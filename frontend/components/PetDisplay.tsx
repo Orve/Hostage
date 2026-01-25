@@ -16,6 +16,7 @@ interface PetProps {
     character_type?: string; // キャラクタータイプ
   } | null;
   onRevive?: () => void; // 親から蘇生関数を受け取る
+  onPurge?: () => void; // 親から削除関数を受け取る
 }
 
 /**
@@ -25,12 +26,13 @@ interface PetProps {
  * HPバー、ステータステキスト、グリッチエフェクトを含む。
  * キャラクター画像はcharacterAssetsモジュールにより動的に切り替え。
  */
-export default function PetDisplay({ pet, onRevive }: PetProps) {
+export default function PetDisplay({ pet, onRevive, onPurge }: PetProps) {
   const { t } = useTranslation();
 
   if (!pet) return <div className="text-gray-500">{t('ui.no_active_pet')}</div>;
 
   const hpPercent = (pet.hp / pet.max_hp) * 100;
+  // 以下、変数が消えていたので復元
   const isDead = pet.status === 'DEAD' || pet.hp <= 0;
   const isCritical = pet.hp > 0 && pet.hp <= 29;
   const isWarning = pet.hp >= 30 && pet.hp < 80;
@@ -85,6 +87,7 @@ export default function PetDisplay({ pet, onRevive }: PetProps) {
           status={getStatus()}
           glowIntensity={isCritical ? 'high' : 'normal'}
           onRevive={onRevive}
+          onPurge={onPurge}
           characterType={pet.character_type || DEFAULT_CHARACTER_TYPE}
         />
       </div>
@@ -124,7 +127,7 @@ export default function PetDisplay({ pet, onRevive }: PetProps) {
             {getStatusText()}
           </span>
         </div>
-      </div>
+      </div >
     </>
   );
 }
