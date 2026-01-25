@@ -10,8 +10,10 @@ import CreatePetForm from "../components/CreatePetForm";
 import TaskManager from "../components/TaskManager";
 import HabitManager from "../components/HabitManager";
 import DashboardLayout from "../components/DashboardLayout";
+import { useTranslation } from "@/lib/i18n/LanguageContext";
 
 export default function Home() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
@@ -113,10 +115,10 @@ export default function Home() {
         {loading ? (
           <div className="text-center py-16">
             <div className="text-cyan-500 text-xl tracking-[0.3em] uppercase animate-pulse mb-4">
-              LOADING_SYSTEM
+              {t('dashboard.loading_system')}
             </div>
             <div className="text-cyan-900 text-xs tracking-widest">
-              [ PLEASE_WAIT ]
+              {t('dashboard.please_wait')}
             </div>
           </div>
         ) : pet ? (
@@ -130,7 +132,7 @@ export default function Home() {
                 disabled={syncing}
                 className="w-full p-3 border border-cyan-900/50 bg-black hover:bg-cyan-900/20 active:bg-cyan-900/40 text-cyan-500 hover:text-cyan-300 transition-all text-xs tracking-widest uppercase disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {syncing ? 'SYNCING...' : 'SYNC_NOTION'}
+                {syncing ? t('dashboard.syncing') : t('dashboard.sync_notion')}
               </button>
 
               {syncMessage && (

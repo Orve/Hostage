@@ -4,8 +4,10 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../components/AuthProvider";
 import SystemError from "../../components/SystemError";
+import { useTranslation } from "@/lib/i18n/LanguageContext";
 
 function LoginPageContent() {
+  const { t } = useTranslation();
   const { signInWithGoogle } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,10 +59,10 @@ function LoginPageContent() {
         {/* Logo/Title */}
         <div className="text-center mb-12">
           <h1 className="text-5xl md:text-6xl font-black tracking-[0.2em] mb-4 text-transparent bg-clip-text bg-gradient-to-b from-gray-100 to-gray-600 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] uppercase">
-            HOSTAGE
+            {t('login.title')}
           </h1>
           <div className="text-xs tracking-[0.3em] text-green-900/70 uppercase">
-            Negligence Protocol v0.9.9
+            {t('login.subtitle')}
           </div>
         </div>
 
@@ -68,11 +70,10 @@ function LoginPageContent() {
         <div className="border-2 border-green-800 bg-black/80 p-8 shadow-[0_0_30px_rgba(0,255,65,0.2)]">
           <div className="mb-6">
             <div className="text-sm tracking-widest text-green-500/70 uppercase text-center mb-2">
-              [ Authentication Required ]
+              {t('login.auth_required')}
             </div>
-            <p className="text-xs text-green-900/90 text-center tracking-wider">
-              Your tasks demand supervision.<br />
-              Identify yourself to proceed.
+            <p className="text-xs text-green-900/90 text-center tracking-wider whitespace-pre-line">
+              {t('login.auth_description')}
             </p>
           </div>
 
@@ -89,40 +90,45 @@ function LoginPageContent() {
             `}
           >
             {loading ? (
-              <span className="animate-pulse">[ Connecting... ]</span>
+              <span className="animate-pulse">{t('login.connecting')}</span>
             ) : (
-              "[ Sign In With Google ]"
+              t('login.sign_in_google')
             )}
           </button>
 
           {/* Warning Message */}
           <div className="mt-6 border border-yellow-900 bg-yellow-950/10 p-3">
             <p className="text-[10px] text-yellow-700 tracking-wider text-center uppercase">
-              ⚠ Warning: Your negligence has consequences
+              {t('login.warning')}
             </p>
           </div>
         </div>
 
         {/* Footer */}
         <div className="text-center mt-8 text-[10px] text-green-900/50 tracking-[0.3em] uppercase">
-          System Status: Awaiting Authorization
+          {t('login.status_awaiting')}
         </div>
       </div>
     </main>
   );
 }
 
-export default function LoginPage() {
+function LoadingFallback() {
+  const { t } = useTranslation();
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-black flex items-center justify-center font-mono scanlines vignette">
-        <div className="relative z-10 text-center">
-          <div className="text-green-500 text-2xl tracking-[0.3em] uppercase animate-pulse">
-            LOADING
-          </div>
+    <div className="min-h-screen bg-black flex items-center justify-center font-mono scanlines vignette">
+      <div className="relative z-10 text-center">
+        <div className="text-green-500 text-2xl tracking-[0.3em] uppercase animate-pulse">
+          {t('login.loading')}
         </div>
       </div>
-    }>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
       <LoginPageContent />
     </Suspense>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { ReactNode } from "react";
+import { useTranslation } from "@/lib/i18n/LanguageContext";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -30,6 +31,8 @@ export default function DashboardLayout({
   isDead = false,
   isCritical = false,
 }: DashboardLayoutProps) {
+  const { t } = useTranslation();
+
   return (
     <main className="min-h-screen bg-black p-4 md:p-8 flex flex-col items-center justify-center font-mono relative overflow-hidden transition-colors duration-1000 scanlines vignette">
 
@@ -62,7 +65,7 @@ export default function DashboardLayout({
             {title}
           </h1>
           <div className="text-xs tracking-widest text-gray-500">
-            BUILD: {buildVersion} | MODE: {mode}
+            {t('ui.build')}: {buildVersion} | {t('ui.mode')}: {mode}
           </div>
         </header>
 
@@ -73,8 +76,8 @@ export default function DashboardLayout({
 
         {/* フッター */}
         <div className="mt-16 text-[10px] text-green-900/50 text-center tracking-widest">
-          SYSTEM STATUS: OPERATIONAL<br />
-          CHAMBER_INTERFACE_v{buildVersion}
+          {t('ui.system_status_operational')}<br />
+          {t('ui.chamber_interface')}_v{buildVersion}
         </div>
       </div>
 
@@ -86,12 +89,12 @@ export default function DashboardLayout({
 
           <h1
             className="text-4xl sm:text-6xl md:text-8xl font-black text-red-600 tracking-wide md:tracking-widest uppercase glitch-text animate-pulse relative z-10 px-4"
-            data-text="SIGNAL_LOST"
+            data-text={t('status.DEAD')}
           >
-            SIGNAL LOST
+            {t('status.DEAD')}
           </h1>
           <div className="mt-8 text-xs text-red-800 tracking-[0.3em] md:tracking-[1em] font-mono animate-bounce px-4">
-            CONNECTION_TERMINATED_BY_HOST
+            {t('status.CONNECTION_TERMINATED')}
           </div>
         </div>
       )}
