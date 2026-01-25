@@ -125,28 +125,11 @@ export default function Home() {
           <div className="w-full">
             <PetDisplay pet={pet} onRevive={handleRevive} />
 
-            {/* Notion同期ボタン */}
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={handleSync}
-                disabled={syncing}
-                className="w-full p-3 border border-cyan-900/50 bg-black hover:bg-cyan-900/20 active:bg-cyan-900/40 text-cyan-500 hover:text-cyan-300 transition-all text-xs tracking-widest uppercase disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {syncing ? t('dashboard.syncing') : t('dashboard.sync_notion')}
-              </button>
-
-              {syncMessage && (
-                <div className="text-center text-[10px] text-gray-500 tracking-widest">
-                  &gt; {syncMessage}
-                </div>
-              )}
-            </div>
-
             {/* タスク管理 */}
             <TaskManager userId={user?.id || ""} onTaskComplete={refreshPetSilently} />
 
             {/* 習慣管理 */}
-            <HabitManager userId={user?.id || ""} />
+            <HabitManager userId={user?.id || ""} onHabitComplete={refreshPetSilently} />
           </div>
         ) : (
           <CreatePetForm userId={user?.id || ""} onSuccess={loadData} />

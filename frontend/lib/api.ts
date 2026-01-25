@@ -258,6 +258,7 @@ export type DailyHabitCheckResponse = {
   action: string;
   new_streak: number;
   message: string;
+  healed: number;
 };
 
 /**
