@@ -8,6 +8,7 @@ type StasisChamberProps = {
   maxHp?: number;
   imageSrc: string;
   status: 'ALIVE' | 'DEAD' | 'CRITICAL' | 'UNINITIALIZED';
+  characterType?: string;
   onRevive?: () => void; // 蘇生アクション用コールバック
   // インタラクション用のオプション
   glowIntensity?: 'low' | 'normal' | 'high';
@@ -114,6 +115,7 @@ export default function StasisChamber({
   fillLevel = 100,
   characterVisible = true,
   characterOpacity = 1,
+  characterType,
   onRevive,
 }: StasisChamberProps) {
   // HP比率を計算
@@ -247,17 +249,22 @@ export default function StasisChamber({
           src={imageSrc}
           alt="Subject"
           className={`
-            w-full h-full object-contain scale-125
-            ${status === 'DEAD' ? '' : 'animate-float'}
+            object-contain transition-all duration-1000
+            ${characterType === 'void-geometry'
+              ? 'w-48 h-48' // Void: 固定サイズ
+              : 'w-full h-full scale-125' // Others: コンテナいっぱい + 拡大
+            }
+            ${status === 'DEAD' ? ''
+              : (characterType === 'void-geometry' ? 'animate-float-void' : 'animate-float')
+            }
             ${decayStage === 'critical' && status !== 'DEAD' ? 'animate-decay-flicker' : ''}
             ${decayGlow}
-            transition-all duration-1000
           `}
           style={{
             filter: decayFilter,
             transformStyle: 'preserve-3d',
             opacity: characterVisible ? characterOpacity : 0,
-            transform: characterVisible ? 'scale(1.25)' : 'scale(0.8)',
+            transform: characterVisible ? (characterType === 'void-geometry' ? 'scale(1)' : 'scale(1.25)') : 'scale(0.8)',
           }}
         />
       </div>

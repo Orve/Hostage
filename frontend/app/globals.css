@@ -290,6 +290,11 @@ body {
   animation: float 8s ease-in-out infinite;
 }
 
+/* Void Geometry Float (Faster) */
+.animate-float-void {
+  animation: float 3s ease-in-out infinite;
+}
+
 /* 7. Bubble Rise - 気泡の上昇 */
 @keyframes bubble-rise {
   0% {

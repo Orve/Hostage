@@ -85,6 +85,7 @@ export default function PetDisplay({ pet, onRevive }: PetProps) {
           status={getStatus()}
           glowIntensity={isCritical ? 'high' : 'normal'}
           onRevive={onRevive}
+          characterType={pet.character_type || DEFAULT_CHARACTER_TYPE}
         />
       </div>
 

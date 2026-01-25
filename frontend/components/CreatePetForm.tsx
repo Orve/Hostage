@@ -492,12 +492,12 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
             {/* フォーム */}
             <form onSubmit={handleSubmit} className="relative z-10 space-y-4 md:space-y-5">
 
-              {/* キャラクター選択グリッド */}
+              {/* キャラクター選択グリッド (Rich Card Selection) */}
               <div>
-                <label className="block text-[10px] md:text-xs text-cyan-500 tracking-[0.15em] md:tracking-[0.2em] uppercase mb-2 font-mono">
+                <label className="block text-[10px] md:text-xs text-cyan-500 tracking-[0.15em] md:tracking-[0.2em] uppercase mb-3 font-mono">
                   {t('incubation.select_genotype')}
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {AVAILABLE_CHARACTERS.map((char) => (
                     <button
                       key={char.id}
@@ -505,78 +505,84 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
                       onClick={() => handleCharacterChange(char.id)}
                       disabled={loading}
                       className={`
-                        relative p-2 border transition-all duration-300 group
-                        flex flex-col items-center gap-2
+                        relative p-3 border-2 transition-all duration-300 group
+                        flex flex-col items-center text-center gap-3 overflow-hidden
                         ${selectedCharacter === char.id
-                          ? 'border-cyan-400 bg-cyan-900/20 shadow-[0_0_10px_rgba(34,211,238,0.3)]'
-                          : 'border-cyan-900/50 bg-black hover:border-cyan-700 hover:bg-cyan-900/10'}
+                          ? 'border-cyan-400 bg-cyan-950/40 shadow-[0_0_20px_rgba(34,211,238,0.3)]'
+                          : 'border-cyan-900/50 bg-black/60 hover:border-cyan-700 hover:bg-cyan-900/10'}
                       `}
                     >
-                      {/* サムネイル (簡易表示) */}
-                      <div className="w-8 h-8 md:w-10 md:h-10 relative overflow-hidden rounded-full border border-cyan-800">
+                      {/* Selection Highlight (Neon Glow effect) */}
+                      {selectedCharacter === char.id && (
+                        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent pointer-events-none" />
+                      )}
+
+                      {/* Icon / Preview Image */}
+                      <div className={`
+                        w-14 h-14 rounded-lg flex items-center justify-center p-1
+                        border border-cyan-800/50 bg-black/50
+                        ${selectedCharacter === char.id ? 'shadow-[0_0_15px_rgba(34,211,238,0.3)] border-cyan-500/50' : 'opacity-70'}
+                      `}>
                         <img
                           src={getCharacterImagePath(char.id, 'healthy')}
                           alt={char.label}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                       </div>
 
-                      <div className="text-[8px] md:text-[9px] tracking-wider uppercase text-cyan-300 font-mono">
-                        {char.label.split(': ')[1]}
+                      {/* Info */}
+                      <div className="flex-1 min-w-0 w-full">
+                        <div className={`text-[10px] md:text-xs font-bold font-mono uppercase tracking-wider mb-1 truncate
+                          ${selectedCharacter === char.id ? 'text-cyan-300 drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]' : 'text-cyan-700'}
+                        `}>
+                          {char.label.split(': ')[1] || char.label}
+                        </div>
+                        <div className="text-[9px] text-gray-500 line-clamp-2 leading-tight h-8">
+                          {char.desc}
+                        </div>
                       </div>
 
-                      {/* Selection Marker */}
+                      {/* Active Indicator Corner */}
                       {selectedCharacter === char.id && (
-                        <motion.div
-                          layoutId="selection-marker"
-                          className="absolute inset-0 border-2 border-cyan-400 pointer-events-none"
-                        />
+                        <div className="absolute top-0 right-0 w-3 h-3 bg-cyan-400 shadow-[0_0_10px_cyan]" style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }} />
                       )}
                     </button>
                   ))}
-
-                  {/* Coming Soon Placeholder (3つ目のスロット埋め) */}
-                  <div className="border border-cyan-900/30 bg-black/50 p-2 flex flex-col items-center justify-center gap-2 opacity-50 cursor-not-allowed">
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border border-cyan-900/50 bg-cyan-950/30 flex items-center justify-center text-cyan-900 font-mono text-xs">?</div>
-                    <div className="text-[8px] tracking-wider uppercase text-cyan-900 font-mono">{t('incubation.locked')}</div>
-                  </div>
                 </div>
+              </div>    {/* ステータスプレビューエリア */}
+              <div className="mt-4 border-t border-cyan-900/30 pt-3">
+                {AVAILABLE_CHARACTERS.map((char) => (
+                  char.id === selectedCharacter && (
+                    <motion.div
+                      key={char.id}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="space-y-3"
+                    >
+                      <div className="text-[10px] text-cyan-400 font-mono text-center tracking-widest uppercase mb-2">
+                        &gt;&gt; {t('incubation.spec')} {char.desc}
+                      </div>
 
-                {/* ステータスプレビューエリア */}
-                <div className="mt-4 border-t border-cyan-900/30 pt-3">
-                  {AVAILABLE_CHARACTERS.map((char) => (
-                    char.id === selectedCharacter && (
-                      <motion.div
-                        key={char.id}
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="space-y-3"
-                      >
-                        <div className="text-[10px] text-cyan-400 font-mono text-center tracking-widest uppercase mb-2">
-                          &gt;&gt; {t('incubation.spec')} {char.desc}
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-2">
-                          {char.stats.map((stat, i) => (
-                            <div key={i} className="flex items-center gap-2">
-                              <div className="w-20 text-[9px] text-cyan-600 font-bold tracking-widest">{stat.label}</div>
-                              <div className="flex-1 h-1.5 bg-cyan-950/50 overflow-hidden relative">
-                                <motion.div
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${stat.value}%` }}
-                                  transition={{ duration: 0.8, delay: i * 0.1, type: "spring" }}
-                                  className={`h-full ${stat.color} shadow-[0_0_5px_currentColor]`}
-                                />
-                              </div>
-                              <div className="w-8 text-[9px] text-right font-mono text-cyan-500">{stat.value}%</div>
+                      <div className="grid grid-cols-1 gap-2">
+                        {char.stats.map((stat, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <div className="w-20 text-[9px] text-cyan-600 font-bold tracking-widest">{stat.label}</div>
+                            <div className="flex-1 h-1.5 bg-cyan-950/50 overflow-hidden relative">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${stat.value}%` }}
+                                transition={{ duration: 0.8, delay: i * 0.1, type: "spring" }}
+                                className={`h-full ${stat.color} shadow-[0_0_5px_currentColor]`}
+                              />
                             </div>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )
-                  ))}
-                </div>
+                            <div className="w-8 text-[9px] text-right font-mono text-cyan-500">{stat.value}%</div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )
+                ))}
               </div>
 
               {/* 入力フィールド */}
@@ -602,12 +608,12 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
                   maxLength={50}
                   autoComplete="off"
                   className={`
-                    w-full px-3 md:px-4 py-2 md:py-3 
-                    bg-black border-2 
+                    w-full px-3 md:px-4 py-2 md:py-3
+                    bg-black border-2
                     ${isFocused ? 'border-cyan-400 shadow-[0_0_15px_rgba(0,255,255,0.3)]' : 'border-cyan-900'}
-                    text-cyan-300 font-mono text-sm tracking-wider 
-                    placeholder:text-cyan-900/50 
-                    focus:outline-none 
+                    text-cyan-300 font-mono text-sm tracking-wider
+                    placeholder:text-cyan-900/50
+                    focus:outline-none
                     transition-all duration-300
                     disabled:opacity-50 disabled:cursor-not-allowed
                   `}
@@ -691,8 +697,8 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
           <div className="text-center mt-3 text-[10px] text-cyan-900/50 tracking-[0.2em]">
             {t('incubation.chamber_version')}
           </div>
-        </motion.div>
-      </motion.div>
-    </div>
+        </motion.div >
+      </motion.div >
+    </div >
   );
 }
