@@ -3,7 +3,7 @@ from supabase.lib.client_options import ClientOptions
 from app.core.config import settings
 
 # HTTP/2問題を回避するためのオプション（タイムアウト延長）
-opts = ClientOptions().replace(
+opts = ClientOptions(
     postgrest_client_timeout=10,
     storage_client_timeout=10
 )
