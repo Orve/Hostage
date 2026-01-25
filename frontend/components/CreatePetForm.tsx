@@ -43,6 +43,16 @@ const AVAILABLE_CHARACTERS_BASE: {
         { labelKey: 'incubation.sync_rate', value: 45, color: 'bg-orange-500' },
       ]
     },
+    {
+      id: 'void-geometry',
+      labelKey: 'incubation.type_void_geometry',
+      descKey: 'incubation.desc_void_geometry',
+      stats: [
+        { labelKey: 'incubation.stability', value: 100, color: 'bg-indigo-400' },
+        { labelKey: 'incubation.resilience', value: 100, color: 'bg-slate-300' },
+        { labelKey: 'incubation.sync_rate', value: 20, color: 'bg-cyan-900' },
+      ]
+    },
   ];
 
 /**

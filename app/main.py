@@ -8,7 +8,7 @@ app = FastAPI(title="HOSTAGE MVP")
 # CORS設定（環境変数で本番/開発を切り替え）
 allowed_origins = os.getenv(
     "ALLOWED_ORIGINS",
-    "http://localhost:3000,https://hostage-app.vercel.app"
+    "http://localhost:3000,https://hostage-app.vercel.app,http://127.0.0.1:3000"
 ).split(",")
 
 app.add_middleware(

@@ -46,8 +46,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   }, [supabase.auth]);
 
   const signInWithGoogle = async () => {
-    // 環境変数を優先し、フォールバックとしてwindow.location.originを使用
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    // ローカル開発環境でのリダイレクト問題を解決するため、window.location.origin を優先使用
+    const siteUrl = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_SITE_URL || '');
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

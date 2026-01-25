@@ -41,15 +41,6 @@ export function getCharacterImagePath(
   characterType: CharacterType,
   status: CharacterHealthState
 ): string {
-  // Void Geometry uses a different path structure
-  if (characterType === 'void-geometry') {
-    // Map status generic names to file specific names
-    const fileSuffix = status === 'healthy' ? 'health'
-      : status === 'dead' ? 'dead'
-        : status; // caution, danger
-    return `/assets/pets/void/void_${fileSuffix}.png`;
-  }
-
   // Standard folder structure: /assets/characters/[type]/[status].png
   return `/assets/characters/${characterType}/${status}.png`;
 }
