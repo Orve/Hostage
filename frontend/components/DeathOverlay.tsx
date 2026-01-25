@@ -59,7 +59,7 @@ export default function DeathOverlay({ onRevive, onPurge }: DeathOverlayProps) {
   return (
     <AnimatePresence>
       <motion.div
-        className="absolute inset-0 z-50 flex flex-col items-center justify-center overflow-hidden bg-black/80 backdrop-blur-sm"
+        className="absolute inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden bg-black/95 backdrop-blur-md"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -109,9 +109,9 @@ export default function DeathOverlay({ onRevive, onPurge }: DeathOverlayProps) {
                   onPurge && onPurge();
                 }
               }}
-              className="text-[10px] text-red-900/50 hover:text-red-500 hover:bg-red-950/30 px-3 py-1 border border-transparent hover:border-red-900/30 transition-all font-mono tracking-widest uppercase"
+              className="mt-8 px-4 py-2 border border-red-900/50 bg-red-950/20 text-red-500/70 text-[10px] uppercase tracking-[0.2em] font-mono hover:bg-red-900/40 hover:text-red-400 hover:border-red-500/50 transition-all duration-300"
             >
-              [ PURGE_SAMPLE_DATA ]
+              [ PURGE SAMPLE DATA ]
             </button>
           </motion.div>
         )}
