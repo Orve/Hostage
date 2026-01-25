@@ -49,7 +49,8 @@ def get_pet_status(user_id: str):
         pet_data = response.data[0]
     else:
         # ALIVEがいなければ、最新のDEADなペットを探す (The Missing Corpse Fix)
-        dead_res = client.table("pets").select("*").eq("user_id", user_id).eq("status", "DEAD").order("created_at", desc=True).limit(1).execute()
+        # created_at が存在しない可能性があるため、確実に存在する last_checked_at でソート
+        dead_res = client.table("pets").select("*").eq("user_id", user_id).eq("status", "DEAD").order("last_checked_at", desc=True).limit(1).execute()
         if dead_res.data:
             pet_data = dead_res.data[0]
         else:
