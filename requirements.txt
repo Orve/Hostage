@@ -1,6 +1,9 @@
 fastapi>=0.100.0
 uvicorn>=0.20.0
-supabase>=2.0.0
+# Supabase関連: HTTP/2 StreamResetエラー対策のため、安定バージョンに固定
+supabase==2.3.4
+httpx==0.24.1
+httpcore==0.17.3
 pydantic>=2.0.0
 pydantic-settings>=2.0.0
 python-dotenv>=1.0.0
