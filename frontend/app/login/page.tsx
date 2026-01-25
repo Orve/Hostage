@@ -109,6 +109,45 @@ function LoginPageContent() {
           {t('login.status_awaiting')}
         </div>
       </div>
+      {/* Dev Login Button (Development Only) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
+          <div className="text-[10px] text-purple-400 font-mono mb-1 bg-black/50 px-1 border border-purple-900/50">
+            DEV_MODE_ACTIVE
+          </div>
+          <button
+            onClick={async () => {
+              try {
+                setLoading(true);
+                // Import dynamically to avoid unused import in prod
+                const { createClient } = await import('@/lib/supabase');
+                const supabase = createClient();
+
+                // Hardcoded test credentials
+                const { error } = await supabase.auth.signInWithPassword({
+                  email: 'test@example.com',
+                  password: 'password',
+                });
+
+                if (error) throw error;
+
+                // Force redirect to dashboard
+                router.push('/');
+                router.refresh();
+              } catch (err) {
+                console.error('Prototyping Login Error:', err);
+                setError(err instanceof Error ? err.message : "Dev Login Failed");
+                setLoading(false);
+              }
+            }}
+            disabled={loading}
+            className="bg-purple-900/20 hover:bg-purple-600/40 text-purple-300 hover:text-white text-xs font-mono py-2 px-4 border border-purple-500/50 hover:border-purple-400 transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.2)] hover:shadow-[0_0_25px_rgba(168,85,247,0.5)] backdrop-blur-md clip-path-polygon"
+            style={{ clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)' }}
+          >
+            ⚡ QUICK_ACCESS_PROTOCOL
+          </button>
+        </div>
+      )}
     </main>
   );
 }
