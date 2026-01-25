@@ -349,7 +349,7 @@ export default function StasisChamber({
           {status === 'UNINITIALIZED' ? (
             <span className="text-cyan-400">HP: ---/---</span>
           ) : (
-            <span>HP: {hp}/{maxHp}</span>
+            <span>HP: {Number.isInteger(hp) ? hp : hp.toFixed(1)}/{maxHp}</span>
           )}
         </div>
         <div className="text-[10px] opacity-70 mt-0.5">

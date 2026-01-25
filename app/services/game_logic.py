@@ -3,7 +3,7 @@ from typing import Dict, Any
 
 # 減衰式: ダメージ = (経過時間 ^ 2) * 係数
 # 開発中: 0.001 (本番では 0.5 に戻す)
-DECAY_COEFFICIENT = 0.001 
+DECAY_COEFFICIENT = 0.5 
 
 def calculate_time_decay(pet: Dict[str, Any]) -> Dict[str, Any]:
     """
