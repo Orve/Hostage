@@ -1,11 +1,11 @@
 fastapi>=0.100.0
 uvicorn>=0.20.0
 # Supabase関連: HTTP/2 StreamResetエラー対策
-# supabase 2.3.4は httpx>=0.24 を要求するため、0.24.1を使用
+# httpx 0.24.0 を使用（0.24.1でproxy引数の互換性問題あり）
 # app/services/supabase.py でHTTP/2を明示的に無効化
 supabase==2.3.4
-httpx==0.24.1
-httpcore==0.17.3
+httpx==0.24.0
+httpcore==0.17.0
 h11<0.15,>=0.13
 pydantic>=2.0.0
 pydantic-settings>=2.0.0
