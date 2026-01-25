@@ -6,82 +6,87 @@ import os
 router = APIRouter(prefix="/cron", tags=["cron"])
 
 @router.post("/sync")
-def sync_overdue_tasks(user_id: str = Query(..., description="User ID to apply sync")):
+def sync_and_punish(user_id: str = Query(..., description="User ID to apply sync")):
     """
-    期限切れのタスク（Supabase）を確認し、ペナルティ（ダメージ）を与えます。
-    Source: Supabase 'tasks' table
-    Condition: completed = false AND due_date < NOW
-    Damage: 2.0 per task (Max 20.0)
+    [The Executioner Protocol]
+    1. Time Decay: 0.5 HP / hour (Linear)
+    2. Task Penalty: 5.0 HP / overdue task
     """
+    # 1. 現在のペット情報を取得
+    pet_res = client.table("pets").select("*").eq("user_id", user_id).eq("status", "ALIVE").execute()
+    if not pet_res.data:
+        # 生きてるペットがいなければ、死んだペットも含めて検索（ステータス更新のため）
+        # ただし今回はMVPなので「Active Pet Only」とする
+        return {"status": "No Active Pet"}
+    
+    pet = pet_res.data[0]
+
+    # 2. 期限切れタスクの数を数える
     now_iso = datetime.now(timezone.utc).isoformat()
     
-    # 1. 期限切れタスクを取得 (Supabase Native)
-    try:
-        # Supabase filtering:
-        # completed is false
-        # due_date is less than now
-        tasks_res = client.table("tasks") \
-            .select("id", "title", "due_date") \
-            .eq("user_id", user_id) \
-            .eq("completed", False) \
-            .lt("due_date", now_iso) \
-            .execute()
+    # Supabase filtering: status != 'DONE' AND due_date < NOW
+    # count='exact', head=True を使いたいが、python clientの仕様上 select(count='exact') する
+    tasks_res = client.table("tasks") \
+        .select("id", count="exact") \
+        .eq("user_id", user_id) \
+        .neq("completed", True) \
+        .lt("due_date", now_iso) \
+        .execute()
+    
+    overdue_count = tasks_res.count if tasks_res.count is not None else 0
+
+    # 3. ダメージ計算
+    # -------------------------------------------------
+    # A. 基礎代謝（時間経過）: Linear Decay
+    # -------------------------------------------------
+    damage_time = 0.0
+    if pet.get('last_checked_at'):
+        # Parse ISO string
+        try:
+            last_checked = datetime.fromisoformat(pet['last_checked_at'].replace('Z', '+00:00'))
+            diff = datetime.now(timezone.utc) - last_checked
+            hours_passed = diff.total_seconds() / 3600.0
             
-        overdue_tasks = tasks_res.data if tasks_res.data else []
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database Query Error: {str(e)}")
-        
-    overdue_count = len(overdue_tasks)
+            if hours_passed > 0:
+                damage_time = hours_passed * 0.5
+        except ValueError:
+            pass # 日付フォーマットエラー時は時間ダメージなし
+
+    # -------------------------------------------------
+    # B. 懲罰（タスク滞留）
+    # -------------------------------------------------
+    DAMAGE_PER_TASK = 5.0 # タスク1個につき 5ダメージ
+    damage_penalty = overdue_count * DAMAGE_PER_TASK
+
+    # 4. 合計ダメージ適用
+    total_damage = damage_time + damage_penalty
     
-    # ダメージ設定
-    DAMAGE_PER_TASK = 2.0
-    MAX_DAMAGE_CAP = 20.0
+    current_hp = float(pet.get('hp', 100))
+    new_hp = max(0.0, current_hp - total_damage)
     
-    raw_damage = overdue_count * DAMAGE_PER_TASK
-    damage = min(raw_damage, MAX_DAMAGE_CAP)
-    
-    # 2. ユーザーのペットを取得
-    pet_res = client.table("pets").select("*").eq("user_id", user_id).eq("status", "ALIVE").execute()
-    
-    if not pet_res.data:
-        # ペットがいない場合でも情報は返す
-        return {
-            "status": "No Active Pet",
-            "overdue_count": overdue_count,
-            "damage_dealt": 0
-        }
-        
-    pet = pet_res.data[0]
-    
-    # 3. ダメージ適用
-    if damage > 0:
-        current_hp = float(pet['hp'])
-        new_hp = max(0.0, current_hp - damage)
-        status = 'DEAD' if new_hp == 0 else 'ALIVE'
-        
-        # 4. 更新
-        update_data = {
-            "hp": new_hp,
-            "status": status,
-            "last_checked_at": now_iso
-        }
-        client.table("pets").update(update_data).eq("id", pet['id']).execute()
-        
-        return {
-            "status": "Synced",
-            "pet_name": pet['name'],
-            "overdue_count": overdue_count,
-            "tasks": [t.get('title') for t in overdue_tasks], # タイトルも返す
-            "damage_per_task": DAMAGE_PER_TASK,
-            "damage_dealt": damage,
-            "remaining_hp": new_hp
-        }
-    
+    # ステータス更新
+    new_status = "ALIVE"
+    if new_hp <= 0:
+        new_status = "DEAD"
+
+    # 5. DBに保存（更新）
+    # Time Decayを行ったので last_checked_at も更新する
+    update_data = {
+        "hp": new_hp,
+        "status": new_status,
+        "last_checked_at": now_iso
+    }
+    client.table("pets").update(update_data).eq("id", pet['id']).execute()
+
     return {
-        "status": "Synced (No Damage)",
-        "overdue_count": 0,
-        "damage_dealt": 0,
-        "remaining_hp": pet['hp']
+        "status": "Executed",
+        "pet_name": pet['name'],
+        "overdue_count": overdue_count,
+        "damage_time": damage_time,
+        "damage_penalty": damage_penalty,
+        "total_damage": total_damage,
+        "new_hp": new_hp,
+        "new_status": new_status
     }
 
 @router.get("/damage")
