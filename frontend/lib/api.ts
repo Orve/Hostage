@@ -31,20 +31,36 @@ export type CreatePetRequest = {
 // ... (Skip unrelated types)
 
 export async function createPet(petData: CreatePetRequest): Promise<Pet> {
-  const res = await fetch(`${API_BASE}/pets/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      user_id: petData.user_id,
-      name: petData.name,
-      character_type: petData.character_type,
-    }),
-  });
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new APIError(res.status, errorData.detail || "Failed to create pet");
+  const url = `${API_BASE}/pets/`;
+  console.log('[API] Creating pet:', { url, petData });
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: petData.user_id,
+        name: petData.name,
+        character_type: petData.character_type,
+      }),
+    });
+
+    console.log('[API] Create pet response status:', res.status);
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      console.error('[API] Create pet error:', { status: res.status, errorData });
+      throw new APIError(res.status, errorData.detail || `Failed to create pet (${res.status})`);
+    }
+
+    const data = await res.json();
+    console.log('[API] Pet created successfully:', data);
+    return data;
+  } catch (error) {
+    if (error instanceof APIError) throw error;
+    console.error('[API] Network or parsing error during pet creation:', error);
+    throw new APIError(0, `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-  return res.json();
 }
 export type Task = {
   id: string;
