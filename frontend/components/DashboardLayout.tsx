@@ -46,7 +46,7 @@ export default function DashboardLayout({
         relative z-10 w-full max-w-lg 
         flex flex-col items-center 
         transition-all duration-500 
-        ${isDead ? "opacity-0" : "opacity-100"}
+        opacity-100
       `}>
 
         {/* ヘッダー */}
@@ -81,23 +81,6 @@ export default function DashboardLayout({
         </div>
       </div>
 
-      {/* ========== 死亡状態: SIGNAL LOST ========== */}
-      {isDead && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black">
-          {/* Static Noise Overlay */}
-          <div className="absolute inset-0 bg-[url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif')] opacity-20 pointer-events-none mix-blend-screen" />
-
-          <h1
-            className="text-4xl sm:text-6xl md:text-8xl font-black text-red-600 tracking-wide md:tracking-widest uppercase glitch-text animate-pulse relative z-10 px-4"
-            data-text={t('status.DEAD')}
-          >
-            {t('status.DEAD')}
-          </h1>
-          <div className="mt-8 text-xs text-red-800 tracking-[0.3em] md:tracking-[1em] font-mono animate-bounce px-4">
-            {t('status.CONNECTION_TERMINATED')}
-          </div>
-        </div>
-      )}
     </main>
   );
 }
