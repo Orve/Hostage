@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createPet } from "../lib/api";
 import StasisChamber from "./StasisChamber";
 import { getCharacterImagePath, CharacterType, DEFAULT_CHARACTER_TYPE } from "../lib/characterAssets";
+import { useTranslation } from "@/lib/i18n/LanguageContext";
 
 interface CreatePetFormProps {
   userId: string;
@@ -15,34 +16,33 @@ interface CreatePetFormProps {
   onCharacterSelect?: (type: CharacterType) => void;
 }
 
-// キャラクター定義
-const AVAILABLE_CHARACTERS: {
+// キャラクター定義（翻訳はコンポーネント内で取得）
+const AVAILABLE_CHARACTERS_BASE: {
   id: CharacterType;
-  label: string;
-  desc: string;
-  stats: { label: string; value: number; color: string }[];
+  labelKey: string;
+  descKey: string;
+  stats: { labelKey: string; value: number; color: string }[];
 }[] = [
     {
       id: 'cyber-fairy',
-      label: 'TYPE-A: FAIRY',
-      desc: 'Digital construct. Sensitive to neglect.',
+      labelKey: 'incubation.type_fairy',
+      descKey: 'incubation.desc_fairy',
       stats: [
-        { label: 'STABILITY', value: 90, color: 'bg-emerald-500' },
-        { label: 'RESILIENCE', value: 40, color: 'bg-cyan-500' },
-        { label: 'SYNC_RATE', value: 85, color: 'bg-purple-500' },
+        { labelKey: 'incubation.stability', value: 90, color: 'bg-emerald-500' },
+        { labelKey: 'incubation.resilience', value: 40, color: 'bg-cyan-500' },
+        { labelKey: 'incubation.sync_rate', value: 85, color: 'bg-purple-500' },
       ]
     },
     {
       id: 'bio-mutant',
-      label: 'TYPE-B: POLYP',
-      desc: 'Deep sea organism. High corruption risk.',
+      labelKey: 'incubation.type_polyp',
+      descKey: 'incubation.desc_polyp',
       stats: [
-        { label: 'STABILITY', value: 30, color: 'bg-yellow-500' },
-        { label: 'RESILIENCE', value: 95, color: 'bg-red-500' },
-        { label: 'SYNC_RATE', value: 45, color: 'bg-orange-500' },
+        { labelKey: 'incubation.stability', value: 30, color: 'bg-yellow-500' },
+        { labelKey: 'incubation.resilience', value: 95, color: 'bg-red-500' },
+        { labelKey: 'incubation.sync_rate', value: 45, color: 'bg-orange-500' },
       ]
     },
-    // { id: 'synth-android', label: 'TYPE-C: SYNTH', desc: 'COMING SOON...' }, // 実装待ち
   ];
 
 /**
@@ -53,10 +53,23 @@ const AVAILABLE_CHARACTERS: {
  * Framer Motion による劇的な5フェーズ誕生シーケンスを実装。
  */
 export default function CreatePetForm({ userId, onSuccess, mockMode = false, onCharacterSelect }: CreatePetFormProps) {
+  const { t } = useTranslation();
   const [petName, setPetName] = useState("");
   const [selectedCharacter, setSelectedCharacter] = useState<CharacterType>(DEFAULT_CHARACTER_TYPE);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 翻訳されたキャラクター定義
+  const AVAILABLE_CHARACTERS = AVAILABLE_CHARACTERS_BASE.map(char => ({
+    id: char.id,
+    label: t(char.labelKey),
+    desc: t(char.descKey),
+    stats: char.stats.map(stat => ({
+      label: t(stat.labelKey),
+      value: stat.value,
+      color: stat.color,
+    }))
+  }));
 
   // キャラクター変更ラッパー
   const handleCharacterChange = (type: CharacterType) => {
@@ -233,19 +246,19 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
 
     // バリデーション
     if (!petName.trim()) {
-      setError("DESIGNATION_REQUIRED");
+      setError(t('incubation.error_designation_required'));
       setBootMessages(prev => [...prev, "[ ERROR ] EMPTY_DESIGNATION_REJECTED"]);
       return;
     }
 
     if (petName.trim().length < 2) {
-      setError("DESIGNATION_TOO_SHORT");
+      setError(t('incubation.error_designation_short'));
       setBootMessages(prev => [...prev, "[ ERROR ] MINIMUM_2_CHARACTERS_REQUIRED"]);
       return;
     }
 
     if (petName.trim().length > 50) {
-      setError("DESIGNATION_TOO_LONG");
+      setError(t('incubation.error_designation_long'));
       setBootMessages(prev => [...prev, "[ ERROR ] MAXIMUM_50_CHARACTERS_EXCEEDED"]);
       return;
     }
@@ -459,7 +472,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
             <div className="relative z-10 mb-4 md:mb-6 text-center">
               <motion.h2
                 className="text-xl md:text-2xl font-black text-cyan-400 tracking-[0.15em] md:tracking-[0.2em] uppercase mb-1 glitch-text"
-                data-text="INITIALIZE"
+                data-text={t('incubation.initialize')}
                 animate={birthPhase === 'materialize' || birthPhase === 'vitals' ? {
                   textShadow: [
                     "0 0 10px rgba(34, 211, 238, 0.5)",
@@ -469,10 +482,10 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
                   transition: { duration: 0.3, repeat: Infinity }
                 } : {}}
               >
-                INITIALIZE
+                {t('incubation.initialize')}
               </motion.h2>
               <div className="text-[10px] md:text-xs text-cyan-700 tracking-[0.2em] uppercase">
-                SUBJECT_REGISTRATION_PROTOCOL
+                {t('incubation.subject_registration')}
               </div>
             </div>
 
@@ -482,7 +495,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
               {/* キャラクター選択グリッド */}
               <div>
                 <label className="block text-[10px] md:text-xs text-cyan-500 tracking-[0.15em] md:tracking-[0.2em] uppercase mb-2 font-mono">
-                  SELECT_GENOTYPE:
+                  {t('incubation.select_genotype')}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {AVAILABLE_CHARACTERS.map((char) => (
@@ -525,7 +538,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
                   {/* Coming Soon Placeholder (3つ目のスロット埋め) */}
                   <div className="border border-cyan-900/30 bg-black/50 p-2 flex flex-col items-center justify-center gap-2 opacity-50 cursor-not-allowed">
                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border border-cyan-900/50 bg-cyan-950/30 flex items-center justify-center text-cyan-900 font-mono text-xs">?</div>
-                    <div className="text-[8px] tracking-wider uppercase text-cyan-900 font-mono">LOCKED</div>
+                    <div className="text-[8px] tracking-wider uppercase text-cyan-900 font-mono">{t('incubation.locked')}</div>
                   </div>
                 </div>
 
@@ -541,7 +554,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
                         className="space-y-3"
                       >
                         <div className="text-[10px] text-cyan-400 font-mono text-center tracking-widest uppercase mb-2">
-                          &gt;&gt; SPEC: {char.desc}
+                          &gt;&gt; {t('incubation.spec')} {char.desc}
                         </div>
 
                         <div className="grid grid-cols-1 gap-2">
@@ -572,7 +585,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
                   htmlFor="petName"
                   className="block text-[10px] md:text-xs text-cyan-500 tracking-[0.15em] md:tracking-[0.2em] uppercase mb-2 font-mono"
                 >
-                  SUBJECT_IDENTIFIER:
+                  {t('incubation.subject_identifier')}
                 </label>
                 <input
                   id="petName"
@@ -585,7 +598,7 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setIsFocused(false)}
                   disabled={loading}
-                  placeholder="ENTER_DESIGNATION..."
+                  placeholder={t('incubation.enter_designation')}
                   maxLength={50}
                   autoComplete="off"
                   className={`
@@ -600,9 +613,9 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
                   `}
                 />
                 <div className="mt-1 flex justify-between text-[10px] text-cyan-800 tracking-widest">
-                  <span>{petName.length}/50 CHARS</span>
+                  <span>{petName.length}/50 {t('incubation.chars_valid')}</span>
                   {petName.length >= 2 && (
-                    <span className="text-cyan-500">✓ VALID</span>
+                    <span className="text-cyan-500">{t('incubation.valid')}</span>
                   )}
                 </div>
               </div>
@@ -649,14 +662,14 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                       />
                       <span>
-                        {birthPhase === 'vitals' ? 'AWAKENING...' :
-                          birthPhase === 'materialize' ? 'MATERIALIZING...' :
-                            birthPhase === 'chamber' ? 'FILLING...' :
-                              'INITIALIZING...'}
+                        {birthPhase === 'vitals' ? t('incubation.awakening') :
+                          birthPhase === 'materialize' ? t('incubation.materializing') :
+                            birthPhase === 'chamber' ? t('incubation.filling') :
+                              t('incubation.initializing')}
                       </span>
                     </>
                   ) : (
-                    "[ INITIALIZE_SUBJECT ]"
+                    t('incubation.initialize_subject')
                   )}
                 </span>
                 {/* ホバー時のスキャンライン */}
@@ -667,16 +680,16 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
             {/* 警告メッセージ */}
             <div className="relative z-10 mt-4 md:mt-6 border-t border-cyan-900/30 pt-3 md:pt-4">
               <div className="text-[9px] md:text-[10px] text-cyan-900/70 tracking-widest text-center space-y-1">
-                <div className="text-red-700">⚠ CAUTION: LIFE_SUPPORT_PROTOCOL_ACTIVE</div>
-                <div>SUBJECT_REQUIRES_DAILY_MAINTENANCE</div>
-                <div className="text-red-800">NEGLECT → SUBJECT_TERMINATION</div>
+                <div className="text-red-700">{t('incubation.caution_life_support')}</div>
+                <div>{t('incubation.requires_maintenance')}</div>
+                <div className="text-red-800">{t('incubation.neglect_warning')}</div>
               </div>
             </div>
           </div>
 
           {/* フッター */}
           <div className="text-center mt-3 text-[10px] text-cyan-900/50 tracking-[0.2em]">
-            CHAMBER_INITIALIZATION_v1.0.3
+            {t('incubation.chamber_version')}
           </div>
         </motion.div>
       </motion.div>

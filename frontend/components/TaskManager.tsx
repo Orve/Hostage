@@ -10,6 +10,7 @@ import {
   Task,
   CreateTaskRequest
 } from "../lib/api";
+import { useTranslation } from "@/lib/i18n/LanguageContext";
 
 interface TaskManagerProps {
   userId: string;
@@ -24,6 +25,7 @@ interface TaskManagerProps {
  * 期限切れタスクは赤く禍々しく表示される。
  */
 export default function TaskManager({ userId, onTaskComplete }: TaskManagerProps) {
+  const { t } = useTranslation();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -173,11 +175,11 @@ export default function TaskManager({ userId, onTaskComplete }: TaskManagerProps
   // 優先度ラベル
   const getPriorityLabel = (priority: Task['priority']) => {
     switch (priority) {
-      case 'critical': return 'CRITICAL';
-      case 'high': return 'HIGH';
-      case 'medium': return 'MEDIUM';
-      case 'low': return 'LOW';
-      default: return 'MEDIUM';
+      case 'critical': return t('task.priority_critical');
+      case 'high': return t('task.priority_high');
+      case 'medium': return t('task.priority_medium');
+      case 'low': return t('task.priority_low');
+      default: return t('task.priority_medium');
     }
   };
 
@@ -205,7 +207,7 @@ export default function TaskManager({ userId, onTaskComplete }: TaskManagerProps
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-bold text-cyan-400 tracking-[0.2em] uppercase">
-            ACTIVE_TASKS
+            {t('task.active_tasks')}
           </h3>
           {/* 期限切れ警告バッジ */}
           {overdueCount > 0 && (
@@ -214,7 +216,7 @@ export default function TaskManager({ userId, onTaskComplete }: TaskManagerProps
               animate={{ scale: 1 }}
               className="px-2 py-0.5 text-[10px] font-bold bg-red-600 text-black tracking-wider animate-pulse"
             >
-              {overdueCount} OVERDUE
+              {overdueCount} {t('task.overdue')}
             </motion.span>
           )}
         </div>
@@ -224,7 +226,7 @@ export default function TaskManager({ userId, onTaskComplete }: TaskManagerProps
           onClick={() => setShowAddForm(!showAddForm)}
           className="px-3 py-1 text-xs border border-cyan-700 text-cyan-400 hover:bg-cyan-900/30 tracking-wider uppercase"
         >
-          {showAddForm ? "CANCEL" : "+ ADD_TASK"}
+          {showAddForm ? t('action.cancel') : t('task.add_task')}
         </motion.button>
       </div>
 
@@ -258,7 +260,7 @@ export default function TaskManager({ userId, onTaskComplete }: TaskManagerProps
                 type="text"
                 value={newTaskTitle}
                 onChange={(e) => setNewTaskTitle(e.target.value)}
-                placeholder="ENTER_TASK_DESIGNATION..."
+                placeholder={t('task.title_placeholder')}
                 className="w-full px-3 py-2 bg-black border border-cyan-800 text-cyan-300 text-sm font-mono placeholder:text-cyan-900/50 focus:outline-none focus:border-cyan-400"
                 disabled={isSubmitting}
                 maxLength={200}
@@ -266,7 +268,7 @@ export default function TaskManager({ userId, onTaskComplete }: TaskManagerProps
 
               {/* 優先度選択 */}
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-cyan-600 tracking-widest">PRIORITY:</span>
+                <span className="text-[10px] text-cyan-600 tracking-widest">{t('task.priority')}</span>
                 <div className="flex gap-1">
                   {(['low', 'medium', 'high', 'critical'] as const).map((p) => (
                     <button
@@ -292,7 +294,7 @@ export default function TaskManager({ userId, onTaskComplete }: TaskManagerProps
                 whileTap={{ scale: 0.98 }}
                 className="w-full py-2 border border-emerald-700 text-emerald-400 hover:bg-emerald-900/30 text-xs tracking-[0.2em] uppercase disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? "CREATING..." : "CREATE_TASK"}
+                {isSubmitting ? t('task.creating') : t('task.create_task')}
               </motion.button>
             </div>
           </motion.form>
@@ -315,16 +317,16 @@ export default function TaskManager({ userId, onTaskComplete }: TaskManagerProps
         {loading ? (
           <div className="text-center py-4">
             <span className="text-cyan-600 text-xs tracking-[0.3em] animate-pulse">
-              LOADING_TASKS...
+              {t('task.loading')}
             </span>
           </div>
         ) : tasks.length === 0 ? (
           <div className="text-center py-6 border border-dashed border-cyan-900/30">
             <div className="text-cyan-800 text-xs tracking-widest">
-              NO_ACTIVE_TASKS
+              {t('task.no_tasks')}
             </div>
             <div className="text-cyan-900/50 text-[10px] mt-1 tracking-wider">
-              ADD A TASK TO HEAL YOUR SUBJECT
+              {t('task.add_task_help')}
             </div>
           </div>
         ) : (
@@ -346,7 +348,7 @@ export default function TaskManager({ userId, onTaskComplete }: TaskManagerProps
                   {/* 期限切れバッジ */}
                   {overdue && (
                     <div className="absolute top-0 right-0 bg-red-600 text-black text-[8px] font-bold px-2 py-0.5 tracking-wider">
-                      ⚠ {daysOverdue}D OVERDUE
+                      ⚠ {daysOverdue}{t('task.days_overdue_suffix')}
                     </div>
                   )}
 
@@ -374,8 +376,8 @@ export default function TaskManager({ userId, onTaskComplete }: TaskManagerProps
                       </span>
                       {task.due_date && (
                         <span className={`text-[10px] ${overdue ? 'text-red-500 animate-pulse font-bold' : 'opacity-40'}`}>
-                          DUE: {new Date(task.due_date).toLocaleDateString()}
-                          {overdue && ' [DAMAGE_ACTIVE]'}
+                          {t('task.due')} {new Date(task.due_date).toLocaleDateString()}
+                          {overdue && ` ${t('task.damage_active')}`}
                         </span>
                       )}
                       {!task.due_date && (

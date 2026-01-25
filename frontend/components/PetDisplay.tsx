@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import StasisChamber from './StasisChamber';
 import { getCharacterImageByStatus, DEFAULT_CHARACTER_TYPE } from '@/lib/characterAssets';
+import { useTranslation } from '@/lib/i18n/LanguageContext';
 
 interface PetProps {
   pet: {
@@ -25,7 +26,9 @@ interface PetProps {
  * キャラクター画像はcharacterAssetsモジュールにより動的に切り替え。
  */
 export default function PetDisplay({ pet, onRevive }: PetProps) {
-  if (!pet) return <div className="text-gray-500">No Active Pet</div>;
+  const { t } = useTranslation();
+
+  if (!pet) return <div className="text-gray-500">{t('ui.no_active_pet')}</div>;
 
   const hpPercent = (pet.hp / pet.max_hp) * 100;
   const isDead = pet.status === 'DEAD' || pet.hp <= 0;
@@ -41,10 +44,10 @@ export default function PetDisplay({ pet, onRevive }: PetProps) {
 
   // ステータステキスト
   const getStatusText = () => {
-    if (isDead) return "SYSTEM_FAILURE";
-    if (isCritical) return "CRITICAL_ERROR";
-    if (isWarning) return "UNSTABLE";
-    return "OPERATIONAL";
+    if (isDead) return t('status.SYSTEM_FAILURE');
+    if (isCritical) return t('status.CRITICAL');
+    if (isWarning) return t('status.UNSTABLE');
+    return t('status.OPERATIONAL');
   };
 
   // HP状態別の画像（characterAssetsモジュールを使用）
@@ -63,10 +66,10 @@ export default function PetDisplay({ pet, onRevive }: PetProps) {
       {/* ========== ペット名表示 ========== */}
       <div className="text-center mb-4">
         <h2 className="text-lg md:text-xl font-bold text-cyan-400 tracking-[0.2em] uppercase">
-          SUBJECT: {pet.name.toUpperCase()}
+          {t('ui.subject')}: {pet.name.toUpperCase()}
         </h2>
         <div className="text-[10px] text-cyan-700 tracking-widest">
-          INFECTION_LEVEL: {pet.infection_level}%
+          {t('ui.infection_level')}: {pet.infection_level}%
         </div>
       </div>
 

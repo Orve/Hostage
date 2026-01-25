@@ -9,6 +9,7 @@ import {
   deleteDailyHabit,
   DailyHabit,
 } from "../lib/api";
+import { useTranslation } from "@/lib/i18n/LanguageContext";
 
 interface HabitManagerProps {
   userId: string;
@@ -22,6 +23,7 @@ interface HabitManagerProps {
  * 炎アイコンでストリークを強調表示する。
  */
 export default function HabitManager({ userId }: HabitManagerProps) {
+  const { t, locale } = useTranslation();
   const [habits, setHabits] = useState<DailyHabit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -154,7 +156,11 @@ export default function HabitManager({ userId }: HabitManagerProps) {
     // ストリークメッセージを表示
     if (!wasCompleted) {
       const newStreak = targetHabit.streak + 1;
-      setStreakMessage(newStreak > 1 ? `🔥 ${newStreak}日連続！` : "✓ 完了！");
+      setStreakMessage(
+        newStreak > 1
+          ? `🔥 ${newStreak}${t('habit.streak_message')}`
+          : `✓ ${t('habit.completed')}`
+      );
       setTimeout(() => setStreakMessage(null), 2000);
     }
 
@@ -201,12 +207,12 @@ export default function HabitManager({ userId }: HabitManagerProps) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-bold text-amber-400 tracking-[0.2em] uppercase">
-            DAILY_HABITS
+            {t('habit.daily_habits')}
           </h3>
           {/* トータルストリーク表示 */}
           {habits.length > 0 && (
             <span className="px-2 py-0.5 text-[10px] font-bold bg-amber-900/50 text-amber-400 tracking-wider">
-              🔥 {habits.reduce((sum, h) => sum + h.streak, 0)} TOTAL
+              🔥 {habits.reduce((sum, h) => sum + h.streak, 0)} {t('habit.total')}
             </span>
           )}
         </div>
@@ -216,7 +222,7 @@ export default function HabitManager({ userId }: HabitManagerProps) {
           onClick={() => setShowAddForm(!showAddForm)}
           className="px-3 py-1 text-xs border border-amber-700 text-amber-400 hover:bg-amber-900/30 tracking-wider uppercase"
         >
-          {showAddForm ? "CANCEL" : "+ ADD_HABIT"}
+          {showAddForm ? t('action.cancel') : t('habit.add_habit')}
         </motion.button>
       </div>
 
@@ -250,7 +256,7 @@ export default function HabitManager({ userId }: HabitManagerProps) {
                 type="text"
                 value={newHabitTitle}
                 onChange={(e) => setNewHabitTitle(e.target.value)}
-                placeholder="ENTER_HABIT_NAME..."
+                placeholder={t('habit.title_placeholder')}
                 className="w-full px-3 py-2 bg-black border border-amber-800 text-amber-300 text-sm font-mono placeholder:text-amber-900/50 focus:outline-none focus:border-amber-400"
                 disabled={isSubmitting}
                 maxLength={100}
@@ -264,7 +270,7 @@ export default function HabitManager({ userId }: HabitManagerProps) {
                 whileTap={{ scale: 0.98 }}
                 className="w-full py-2 border border-amber-700 text-amber-400 hover:bg-amber-900/30 text-xs tracking-[0.2em] uppercase disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? "CREATING..." : "CREATE_HABIT"}
+                {isSubmitting ? t('habit.creating') : t('habit.create_habit')}
               </motion.button>
             </div>
           </motion.form>
@@ -287,16 +293,16 @@ export default function HabitManager({ userId }: HabitManagerProps) {
         {loading ? (
           <div className="text-center py-4">
             <span className="text-amber-600 text-xs tracking-[0.3em] animate-pulse">
-              LOADING_HABITS...
+              {t('habit.loading')}
             </span>
           </div>
         ) : habits.length === 0 ? (
           <div className="text-center py-6 border border-dashed border-amber-900/30">
             <div className="text-amber-800 text-xs tracking-widest">
-              NO_HABITS_REGISTERED
+              {t('habit.no_habits')}
             </div>
             <div className="text-amber-900/50 text-[10px] mt-1 tracking-wider">
-              ADD A HABIT TO BUILD YOUR STREAK
+              {t('habit.add_habit_help')}
             </div>
           </div>
         ) : (
