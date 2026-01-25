@@ -86,6 +86,25 @@ export default function Home() {
     }
   };
 
+  // 削除アクション（Purge）
+  const handlePurge = async () => {
+    if (!user?.id) return;
+    try {
+      setLoading(true);
+      // ダイナミックインポートで循環参照を回避しつつAPIを呼ぶ（本来はimport済みでよい）
+      const { deletePet } = await import('../lib/api');
+      await deletePet(user.id);
+
+      // 成功したらリロードしてオンボーディングへ
+      // ルーターの遷移よりもリロードの方が確実に状態をクリアできる
+      window.location.reload();
+    } catch (e) {
+      console.error(e);
+      setError("PURGE_FAILED");
+      setLoading(false);
+    }
+  };
+
   // Show error state if data fetch failed
   if (error) {
     return (
@@ -123,7 +142,11 @@ export default function Home() {
           </div>
         ) : pet ? (
           <div className="w-full">
-            <PetDisplay pet={pet} onRevive={handleRevive} />
+            <PetDisplay
+              pet={pet}
+              onRevive={handleRevive}
+              onPurge={handlePurge}
+            />
 
             {/* タスク管理 */}
             <TaskManager userId={user?.id || ""} onTaskComplete={refreshPetSilently} />

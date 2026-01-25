@@ -10,6 +10,7 @@ type StasisChamberProps = {
   status: 'ALIVE' | 'DEAD' | 'CRITICAL' | 'UNINITIALIZED';
   characterType?: string;
   onRevive?: () => void; // 蘇生アクション用コールバック
+  onPurge?: () => void; // 削除アクション用コールバック
   // インタラクション用のオプション
   glowIntensity?: 'low' | 'normal' | 'high';
   // 誕生シーケンス用のオプション
@@ -117,6 +118,7 @@ export default function StasisChamber({
   characterOpacity = 1,
   characterType,
   onRevive,
+  onPurge,
 }: StasisChamberProps) {
   // HP比率を計算
   const hpRatio = Math.max(0, Math.min(100, (hp / maxHp) * 100));
@@ -320,7 +322,10 @@ export default function StasisChamber({
 
         {/* 死亡時のオーバーレイ (Revival Protocol) */}
         {status === 'DEAD' && (
-          <DeathOverlay onRevive={onRevive || (() => { })} />
+          <DeathOverlay
+            onRevive={onRevive || (() => { })}
+            onPurge={onPurge}
+          />
         )}
 
         {/* 培養槽のフレーム装飾 */}
