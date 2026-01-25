@@ -251,7 +251,7 @@ export default function StasisChamber({
           className={`
             object-contain transition-all duration-1000
             ${characterType === 'void-geometry'
-              ? 'w-48 h-48' // Void: 固定サイズ
+              ? 'w-64 h-64' // Void: 固定サイズ (大きく)
               : 'w-full h-full scale-125' // Others: コンテナいっぱい + 拡大
             }
             ${status === 'DEAD' ? ''
@@ -264,7 +264,7 @@ export default function StasisChamber({
             filter: decayFilter,
             transformStyle: 'preserve-3d',
             opacity: characterVisible ? characterOpacity : 0,
-            transform: characterVisible ? (characterType === 'void-geometry' ? 'scale(1)' : 'scale(1.25)') : 'scale(0.8)',
+            transform: characterVisible ? (characterType === 'void-geometry' ? 'scale(1.1)' : 'scale(1.25)') : 'scale(0.8)',
           }}
         />
       </div>

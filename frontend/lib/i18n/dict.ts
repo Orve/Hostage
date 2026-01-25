@@ -419,6 +419,10 @@ export const dict = {
       en: 'Deep sea organism. High corruption risk.',
       ja: '深海生物。汚染リスク高。',
     },
+    desc_void_geometry: {
+      en: 'High stability. Slow recovery.',
+      ja: '高安定型。堅牢だが再構築に時間を要する。',
+    },
     // Error messages
     error_designation_required: {
       en: 'DESIGNATION_REQUIRED',

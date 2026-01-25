@@ -20,6 +20,17 @@ def create_pet(pet_in: PetCreate):
         "character_type": pet_in.character_type
     }
     
+    
+    # Check if user profile exists
+    user_check = client.table("profiles").select("id").eq("id", pet_in.user_id).execute()
+    
+    if not user_check.data:
+        # Auto-create profile for development/testing ease
+        # In production, this should ideally be handled by Supabase Auth triggers
+        # In production, this should ideally be handled by Supabase Auth triggers
+        # print(f"Creating missing profile for user: {pet_in.user_id}")
+        client.table("profiles").insert({"id": str(pet_in.user_id)}).execute()
+
     response = client.table("pets").insert(new_pet).execute()
     
     if not response.data:

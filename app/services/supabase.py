@@ -1,6 +1,9 @@
 import os
 import httpx
+from dotenv import load_dotenv  # 👈 追加: ライブラリをインポート
 
+# 👇 追加: これが実行された瞬間に .env の中身がメモリに展開されます
+load_dotenv()
 # ==========================================
 # 🛡️ HTTP/2 DISABLE FLAG (The Magic Switch)
 # ==========================================
@@ -55,7 +58,7 @@ if not key:
 # シンプルな初期化に戻します。オプションは指定しません。
 try:
     client: Client = create_client(url, key)
-    print("✅ Supabase client initialized successfully!")
+    # print("✅ Supabase client initialized successfully!")
 except Exception as e:
-    print(f"🚨 Failed to initialize Supabase client: {e}")
+    # print(f"🚨 Failed to initialize Supabase client: {e}")
     raise e
