@@ -17,29 +17,33 @@ body {
   color: var(--foreground);
   font-family: var(--font-mono);
   overflow-x: hidden;
-  height: 100vh;
+  min-height: 100dvh; /* dvh for mobile browser address bar compatibility */
   width: 100vw;
   margin: 0;
+  padding: 0;
 }
 
 /* --- CRT & Horror Effects --- */
+
+/*
+ * NOTE: These legacy classes are kept for backward compatibility.
+ * New implementation uses <ScreenEffect /> component in layout.tsx
+ * for better mobile coverage (iOS status bar, etc).
+ */
 
 /* 1. CRT Scanlines */
 .scanlines::before {
   content: " ";
   display: block;
   position: fixed;
-  /* Fixed to cover screen */
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
+  inset: 0; /* Shorthand for top/right/bottom/left: 0 */
+  width: 100vw;
+  height: 100dvh; /* dvh handles mobile address bar */
   background: linear-gradient(to bottom,
       rgba(18, 16, 16, 0) 50%,
       rgba(0, 0, 0, 0.25) 50%);
   background-size: 100% 4px;
   z-index: 50;
-  /* Above everything */
   pointer-events: none;
 }
 
@@ -48,10 +52,9 @@ body {
   content: " ";
   display: block;
   position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
   background: radial-gradient(circle,
       rgba(0, 0, 0, 0) 60%,
       rgba(0, 0, 0, 0.8) 100%);

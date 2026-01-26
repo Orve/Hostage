@@ -1,7 +1,8 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import { useTranslation } from "@/lib/i18n/LanguageContext";
+import SystemGuideModal from "./SystemGuideModal";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -32,9 +33,32 @@ export default function DashboardLayout({
   isCritical = false,
 }: DashboardLayoutProps) {
   const { t } = useTranslation();
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
+
+  // 初回アクセス時の自動表示
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem('hasSeenGuide');
+    if (!hasSeenGuide) {
+      // 少し遅延させて表示（ページロード後のスムーズな体験）
+      const timer = setTimeout(() => {
+        setIsGuideOpen(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   return (
     <main className="min-h-screen bg-black p-4 md:p-8 flex flex-col items-center justify-center font-mono relative overflow-hidden transition-colors duration-1000 scanlines vignette">
+
+      {/* ========== Help FAB - Fixed in bottom-right corner ========== */}
+      <button
+        onClick={() => setIsGuideOpen(true)}
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-cyan-700 bg-black/95 hover:bg-cyan-900/40 hover:border-cyan-500 text-cyan-500 hover:text-cyan-300 transition-all flex items-center justify-center text-xl md:text-2xl font-black group shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_35px_rgba(6,182,212,0.7)] hover:scale-110"
+        aria-label="Help"
+        title="System Operation Manual"
+      >
+        <span className="group-hover:rotate-12 transition-transform duration-300">?</span>
+      </button>
 
       {/* ========== ホラーオーバーレイ（CRITICAL時） ========== */}
       {isCritical && !isDead && (
@@ -43,9 +67,9 @@ export default function DashboardLayout({
 
       {/* ========== メインコンテンツ ========== */}
       <div className={`
-        relative z-10 w-full max-w-lg 
-        flex flex-col items-center 
-        transition-all duration-500 
+        relative z-10 w-full max-w-lg
+        flex flex-col items-center
+        transition-all duration-500
         opacity-100
       `}>
 
@@ -53,8 +77,8 @@ export default function DashboardLayout({
         <header className="mb-8 text-center px-4">
           <h1
             className={`
-              text-2xl md:text-4xl lg:text-5xl font-black 
-              tracking-[0.1em] md:tracking-[0.2em] uppercase mb-2 
+              text-2xl md:text-4xl lg:text-5xl font-black
+              tracking-[0.1em] md:tracking-[0.2em] uppercase mb-2
               ${isCritical
                 ? "text-red-600 glitch-text"
                 : "text-transparent bg-clip-text bg-gradient-to-b from-gray-100 to-gray-600 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
@@ -80,6 +104,12 @@ export default function DashboardLayout({
           {t('ui.chamber_interface')}_v{buildVersion}
         </div>
       </div>
+
+      {/* System Guide Modal */}
+      <SystemGuideModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
+      />
 
     </main>
   );

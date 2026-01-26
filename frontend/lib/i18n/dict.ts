@@ -439,6 +439,286 @@ export const dict = {
   },
 
   // ========================================
+  // PWA INSTALL PROMPT
+  // ========================================
+  pwa: {
+    system_alert: {
+      en: '⚠ SYSTEM_ALERT',
+      ja: '⚠ システム警告',
+    },
+    restricted_mode: {
+      en: '⚡ RESTRICTED_MODE_DETECTED',
+      ja: '⚡ 制限モード検出',
+    },
+    browser_shell: {
+      en: 'Running in browser shell. Install to',
+      ja: 'ブラウザシェルで実行中。',
+    },
+    local_shell: {
+      en: 'LOCAL_SHELL',
+      ja: 'ローカルシェル',
+    },
+    full_experience: {
+      en: 'for full immersive experience.',
+      ja: 'にインストールして完全な没入体験を。',
+    },
+    installation_protocol: {
+      en: '&gt;&gt; INSTALLATION_PROTOCOL:',
+      ja: '&gt;&gt; インストール手順：',
+    },
+    // iOS instructions
+    ios_step1: {
+      en: 'Tap the',
+      ja: '画面下部の',
+    },
+    ios_share: {
+      en: 'Share',
+      ja: '共有',
+    },
+    ios_step1_end: {
+      en: 'button at the bottom',
+      ja: 'ボタンをタップ',
+    },
+    ios_step2: {
+      en: 'Select',
+      ja: 'メニューから',
+    },
+    ios_add_home: {
+      en: '"Add to Home Screen"',
+      ja: '「ホーム画面に追加」',
+    },
+    ios_step2_end: {
+      en: '',
+      ja: 'を選択',
+    },
+    ios_step3: {
+      en: 'Confirm installation',
+      ja: 'インストールを確認',
+    },
+    // Android instructions
+    android_step1: {
+      en: 'Tap the',
+      ja: '右上の',
+    },
+    android_menu: {
+      en: 'Menu',
+      ja: 'メニュー',
+    },
+    android_step1_end: {
+      en: 'button (⋮) at the top-right',
+      ja: 'ボタン（⋮）をタップ',
+    },
+    android_step2: {
+      en: 'Select',
+      ja: 'メニューから',
+    },
+    android_add_home: {
+      en: '"Add to Home screen"',
+      ja: '「ホーム画面に追加」',
+    },
+    android_or: {
+      en: 'or',
+      ja: 'または',
+    },
+    android_install: {
+      en: '"Install App"',
+      ja: '「アプリをインストール」',
+    },
+    android_step3: {
+      en: 'Confirm installation',
+      ja: 'インストールを確認',
+    },
+    // Benefits
+    benefit_fullscreen: {
+      en: '✓ Fullscreen immersion (no browser UI)',
+      ja: '✓ フルスクリーン没入体験（ブラウザUIなし）',
+    },
+    benefit_loading: {
+      en: '✓ Faster loading & offline access',
+      ja: '✓ 高速起動 & オフラインアクセス',
+    },
+    benefit_native: {
+      en: '✓ Native app-like experience',
+      ja: '✓ ネイティブアプリのような体験',
+    },
+    dismiss: {
+      en: '[ DISMISS_NOTIFICATION ]',
+      ja: '[ 通知を閉じる ]',
+    },
+  },
+
+  // ========================================
+  // SYSTEM GUIDE MODAL
+  // ========================================
+  guide: {
+    title: {
+      en: 'SYSTEM_OPERATION_MANUAL',
+      ja: 'システム操作マニュアル',
+    },
+    version: {
+      en: 'VERSION 1.0 - MANDATORY_READING',
+      ja: 'バージョン 1.0 - 必読',
+    },
+    // Warning banner
+    critical_warning: {
+      en: '⚡ CRITICAL_WARNING',
+      ja: '⚡ 重大な警告',
+    },
+    warning_text: {
+      en: 'NEGLIGENCE LEADS TO TERMINATION. The subject under your care will die if maintenance protocols are not followed. Data loss is permanent and irreversible.',
+      ja: '怠惰は終了を招きます。管理下の被験体は、メンテナンスプロトコルに従わなければ死亡します。データ消失は永久的かつ不可逆的です。',
+    },
+    // Primary objective
+    primary_objective: {
+      en: 'PRIMARY_OBJECTIVE',
+      ja: '主要目標',
+    },
+    objective_text: {
+      en: 'Maintain life support for your designated subject (character/pet). The entity\'s HP must remain above 0. If HP reaches 0,',
+      ja: '指定された被験体（キャラクター/ペット）の生命維持を行うこと。HPは0以上に保つ必要があります。HPが0になると、',
+    },
+    termination_final: {
+      en: 'TERMINATION IS FINAL',
+      ja: '終了は最終的',
+    },
+    progress_lost: {
+      en: '. All progress will be lost.',
+      ja: 'です。全ての進捗が失われます。',
+    },
+    // Step 1
+    step1_title: {
+      en: 'REGISTER_TASKS',
+      ja: 'タスク登録',
+    },
+    step1_text: {
+      en: 'Input your daily duties and responsibilities. Each task must have:',
+      ja: '日々の業務と責任を入力してください。各タスクには以下が必要です：',
+    },
+    step1_title_field: {
+      en: 'Title:',
+      ja: 'タイトル：',
+    },
+    step1_title_desc: {
+      en: 'Brief description',
+      ja: '簡潔な説明',
+    },
+    step1_due_field: {
+      en: 'Due Date:',
+      ja: '期限：',
+    },
+    step1_due_desc: {
+      en: 'Deadline for completion',
+      ja: '完了期限',
+    },
+    step1_priority_field: {
+      en: 'Priority:',
+      ja: '優先度：',
+    },
+    step1_priority_desc: {
+      en: 'Importance level',
+      ja: '重要度レベル',
+    },
+    // Step 2
+    step2_title: {
+      en: 'COMPLETE_TASKS',
+      ja: 'タスク完了',
+    },
+    step2_text: {
+      en: 'Check off tasks when completed. Completed tasks within their deadline contribute to',
+      ja: '完了したタスクにチェックを入れてください。期限内に完了したタスクは',
+    },
+    positive_support: {
+      en: 'positive life support',
+      ja: 'ポジティブな生命維持',
+    },
+    step2_text_end: {
+      en: '.',
+      ja: 'に貢献します。',
+    },
+    // Step 3
+    step3_title: {
+      en: 'PENALTY_PROTOCOL',
+      ja: 'ペナルティプロトコル',
+    },
+    step3_text: {
+      en: 'When overdue tasks remain incomplete during system SYNC, the subject will suffer damage.',
+      ja: 'システムSYNC時に期限超過タスクが未完了の場合、被験体はダメージを受けます。',
+    },
+    step3_critical: {
+      en: '⚡ CRITICAL:',
+      ja: '⚡ 重要：',
+    },
+    damage_formula: {
+      en: 'DAMAGE FORMULA:',
+      ja: 'ダメージ計算式：',
+    },
+    damage_text: {
+      en: 'Each overdue task inflicts HP loss. The longer you delay, the more severe the consequences.',
+      ja: '期限超過タスク毎にHP損失が発生。遅延が長いほど、結果は深刻になります。',
+    },
+    // Step 4
+    step4_title: {
+      en: 'SYNC_STATUS',
+      ja: 'ステータス同期',
+    },
+    step4_text: {
+      en: 'The system performs automatic health checks. Open the dashboard regularly to confirm life signs.',
+      ja: 'システムは自動的にヘルスチェックを実行します。定期的にダッシュボードを開いて生命兆候を確認してください。',
+    },
+    active_monitoring: {
+      en: 'Active monitoring prevents catastrophic failure.',
+      ja: 'アクティブな監視が壊滅的な失敗を防ぎます。',
+    },
+    // Step 5
+    step5_title: {
+      en: 'STAY_ALIVE',
+      ja: '生存維持',
+    },
+    step5_text: {
+      en: 'Keep HP above 0 at all costs. Monitor the status chamber frequently.',
+      ja: '何があってもHPを0以上に保ってください。ステータスチャンバーを頻繁に監視してください。',
+    },
+    diligence: {
+      en: 'Your diligence = Subject survival.',
+      ja: 'あなたの勤勉さ = 被験体の生存。',
+    },
+    good_luck: {
+      en: 'Good luck, Operator.',
+      ja: '幸運を、オペレーター。',
+    },
+    // Additional notes
+    additional_notes: {
+      en: '&gt;&gt; ADDITIONAL_NOTES:',
+      ja: '&gt;&gt; 追加情報：',
+    },
+    note_revive: {
+      en: '• You can revive the subject if it dies, but this costs SOL (Solana tokens).',
+      ja: '• 被験体が死亡した場合、SOL（Solanaトークン）を消費して復活可能です。',
+    },
+    note_habits: {
+      en: '• Daily habits can be configured for recurring maintenance tasks.',
+      ja: '• 定期的なメンテナンスタスクにデイリールーチンを設定できます。',
+    },
+    note_decay: {
+      en: '• Visual decay effects indicate health deterioration (scanlines, noise, color shifts).',
+      ja: '• ビジュアルデケイエフェクトが健康悪化を示します（走査線、ノイズ、色変化）。',
+    },
+    note_help: {
+      en: '• This guide can be reopened anytime via the [?] HELP button.',
+      ja: '• このガイドは [?] ヘルプボタンからいつでも再表示できます。',
+    },
+    // Footer
+    acknowledge: {
+      en: '[ ACKNOWLEDGED - I_UNDERSTAND ]',
+      ja: '[ 了解 - 理解しました ]',
+    },
+    confirmation_text: {
+      en: 'PRESSING THIS BUTTON CONFIRMS YOU HAVE READ AND UNDERSTOOD THE PROTOCOLS',
+      ja: 'このボタンを押すことで、プロトコルを読み、理解したことを確認します',
+    },
+  },
+
+  // ========================================
   // HABIT MANAGER
   // ========================================
   habit: {
