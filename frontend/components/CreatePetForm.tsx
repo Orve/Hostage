@@ -254,6 +254,9 @@ export default function CreatePetForm({ userId, onSuccess, mockMode = false, onC
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Scroll to top for birth sequence visibility
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     // バリデーション
     if (!petName.trim()) {
       setError(t('incubation.error_designation_required'));

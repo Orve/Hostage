@@ -26,6 +26,8 @@ export default function DeathOverlay({ onRevive, onPurge }: DeathOverlayProps) {
   const [logIndex, setLogIndex] = useState(0);
 
   const handleReboot = () => {
+    // Scroll to top for boot sequence visibility
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setSequenceState('blackout');
   };
 
@@ -105,6 +107,8 @@ export default function DeathOverlay({ onRevive, onPurge }: DeathOverlayProps) {
             {/* PURGE OPTION (Secondary Action) */}
             <button
               onClick={() => {
+                // Scroll to top for purge sequence visibility
+                window.scrollTo({ top: 0, behavior: 'smooth' });
                 if (confirm("⚠️ WARNING: PURGE PROTOCOL INITIATED ⚠️\n\nAll genetic data will be permanently erased.\nThis action cannot be undone.\n\nProceed?")) {
                   onPurge && onPurge();
                 }

@@ -619,3 +619,12 @@ body {
 .animate-chromatic-shift {
   animation: chromatic-shift 0.3s infinite;
 }
+
+/* ========== Mobile UX Fixes ========== */
+
+/* Prevent auto-zoom on iOS Safari when focusing inputs */
+@media screen and (max-width: 768px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
