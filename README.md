@@ -81,11 +81,15 @@ If HP hits 0, the specimen is terminated. You have two choices:
 - [ ] Solana wallet authentication
 - [ ] Dynamic NFTs that decay with character health
 
-## 💻 Tech Stack
-
-- **Frontend:** Next.js 14, TypeScript, Tailwind CSS
-- **Backend:** FastAPI, Supabase (PostgreSQL)
-- **Infrastructure:** Vercel (Frontend), Railway (Backend)
+## 💻 Tech Stack & Rationale
+- **Frontend: Next.js 14 (App Router)**
+  - Utilized Server Actions for seamless mutation handling directly from components.
+  - PWA Manifest integration for native-like mobile experience.
+- **Backend: FastAPI (Python)**
+  - Selected for high-performance async processing of the "Damage Logic" and future AI integration.
+- **Database: Supabase (PostgreSQL)**
+  - Row Level Security (RLS) enabled for secure user data isolation.
+  - Realtime subscriptions used for instant HP updates across devices.
 
 ## 🎯 Philosophy
 
@@ -137,4 +141,5 @@ npm run dev
 ## 📜 License
 Personal Project - All Rights Reserved
 Built with psychological horror and FastAPI 💀
+
 

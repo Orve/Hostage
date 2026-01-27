@@ -81,10 +81,16 @@ HPが0になると、被検体は**終了（Terminated）**します。選択肢
 - [ ] 健康状態に応じて腐敗・変化する Dynamic NFT
 
 ## 💻 技術スタック (Tech Stack)
+単なる流行の採用ではなく、アプリの特性（リアルタイム性・堅牢性）に最適化された技術選定を行っています。
 
-- **Frontend:** Next.js 14, TypeScript, Tailwind CSS
-- **Backend:** FastAPI, Supabase (PostgreSQL)
-- **Infrastructure:** Vercel (Frontend), Railway (Backend)
+- **Frontend: Next.js 14 (App Router)**
+  - **Server Actions:** APIルートを別途定義せず、コンポーネントから直接DB操作を行うことで開発体験とパフォーマンスを両立。
+  - **PWA Integration:** 「常にユーザーの視界に入れる」というコンセプト実現のため、manifest設定によりネイティブアプリ同等のホーム画面追加をサポート。
+- **Backend: FastAPI (Python)**
+  - **Async Processing:** タスク放置による「キャラクターのダメージ計算」や将来的なAI処理など、重いバックグラウンド処理を非同期で高速に捌くために採用。
+- **Database: Supabase (PostgreSQL)**
+  - **Row Level Security (RLS):** ユーザーデータ分離をDBレベルで強制し、堅牢なセキュリティを担保。
+  - **Realtime Subscriptions:** 複数デバイス間でのHP同期など、即時性が求められるUXのためにWebSocket機能を活用。
 
 ## 🎯 開発哲学 (Philosophy)
 
