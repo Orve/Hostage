@@ -12,7 +12,7 @@ A horror-gamified productivity app where your virtual character's survival depen
 
 No App Store download required. Works natively on your browser.
 
-👉 Launch HOSTAGE
+👉 [Launch HOSTAGE](https://hostage-app.xyz/)
 
 1. Open in Mobile Browser — Safari (iOS) or Chrome (Android).
 2. Add to Home Screen — Experience full-screen immersion without address bars.
@@ -137,3 +137,4 @@ npm run dev
 ## 📜 License
 Personal Project - All Rights Reserved
 Built with psychological horror and FastAPI 💀
+
