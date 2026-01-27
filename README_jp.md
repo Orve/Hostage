@@ -2,187 +2,144 @@
 
 <div align="center">
 
-![Demo](./frontend/public/assets/demo.gif)
+> "Your negligence kills." (その怠慢が、命を奪う。)
 
-**"Your negligence kills."**
-*(その怠慢が、命を奪う。)*
-
-[![Live Demo](https://img.shields.io/badge/🎮_PLAY_NOW-red?style=for-the-badge)](https://your-actual-domain.vercel.app)
-[![Status](https://img.shields.io/badge/status-alpha-orange?style=for-the-badge)](https://github.com/yourusername/hostage)
-
-*現実世界のタスク消化状況が、バーチャルキャラクターの「生存」に直結する。*
-*ホラーゲーミフィケーション・タスク管理アプリケーション。*
+現実世界のタスク消化状況が、バーチャルキャラクターの「生存」に直結する。  
+ホラーゲーミフィケーション・タスク管理アプリケーション。
 
 </div>
 
----
+## 🎮 今すぐ試す (PWA Ready)
 
-## 🎮 今すぐ試す（セットアップ不要）
+アプリストアからのダウンロードは不要。ブラウザから直接インストール可能です。
 
-**クリックして遊ぶだけ。インストールは必要ありません。**
+👉 [HOSTAGE を起動する](https://hostage-app.xyz/)
 
-**� [HOSTAGE Webアプリを起動](https://hostage-app.xyz/)**
+1. モバイルブラウザで開く - iOS (Safari) または Android (Chrome) 推奨。
+2. ホーム画面に追加 - アドレスバーのない「全画面の没入体験」が可能になります。
+3. 契約成立 - あなたのタスクリストは、生命維持装置となりました。
 
-1. **デモモードで開始** - すぐに恐怖体験を開始（アカウント不要）
-2. **Googleアカウント連携** - キャラクターの進行状況を保存
-3. **Notion連携** (任意) - リアルなタスク同期で心理的影響を最大化
-
-**すべてブラウザ上で完結します。ダウンロードや設定は不要です。**
-
----
-
-## �💀 コンセプト (The Concept)
+## 💀 コンセプト (The Concept)
 
 従来のタスク管理アプリは優しすぎました。期限を過ぎても、少し罪悪感を感じるだけで、また次の日へ持ち越してしまう。そこには「本当の代償」がありません。
 
-**HOSTAGE はそれを変えます。**
+HOSTAGE はそれを変えます。
 
-あなたのキャラクターはステイシスポッド（生命維持装置）の中にいます。彼らの運命は、あなたの Notion タスクとリンクしています。
-先延ばし（Procrastination）は単なる非効率ではありません。ここでは、**致死的な行為**です。
+あなたのキャラクターはステイシスポッド（生命維持装置）の中にいます。彼らの運命は、あなたのタスク消化とリンクしています。先延ばし（Procrastination）は単なる非効率ではありません。ここでは、致死的な行為です。
 
 ## ⚡ 機能 (Features)
 
-**Notion Sync**  
-Notion データベースから期限切れのタスクを自動検出し、キャラクターに物理的ダメージを与えます。現実の期限破りが、リアルな痛みとなります。
+### 🩸 処刑執行プロトコル (The Executioner Protocol)
 
-**Decay System (減衰システム)**  
-時間経過とともにHPが自然減衰し、未知のウイルス感染が進行します。「時間」そのものがキャラクターを殺しにかかります。
+他のアプリとは異なり、このシステムは冷徹な「減衰アルゴリズム」と「タスク罰」を組み合わせます。
 
-**Routine Healing (習慣による回復)**  
-指定された習慣（Habit）を完了することで、HPを回復しシステムを安定化させることができます。生産性は、生存のための手段です。
+- **時間減衰 (Time Decay):** 時間経過とともにHPが自然減衰（老化）します。
+- **タスク滞留罰 (Task Penalty):** 期限切れタスクを同期するたびに、致命的なダメージを与えます。
+- **結果:** 無視は許されません。生き残るには、消化するしかないのです。
 
-**Horror UI Corruption (UI崩壊)**  
-HPが低下するにつれて、インターフェースが腐敗していきます：
-- CRTスキャンラインと周辺減光（Vignette）
-- 不穏なグリッチテキストアニメーション
-- 警告色に染まるクリティカル状態（Red Pulse）
-- システムエラーメッセージの氾濫
+### 📱 ネイティブPWA体験
 
-**責任を放棄するにつれ、画面が壊れていく様を目撃してください。**
+ホーム画面に追加して使用することを前提に設計されています。
+
+- 全画面の「ステイシスポッド」インターフェース
+- 没入感を削ぐブラウザバーの排除
+- ポケットから「罪悪感」への即時アクセス
+
+### 📉 ホラーUI崩壊 (UI Corruption)
+
+HPが低下するにつれて、インターフェースが物理的に腐敗していきます：
+
+- CRTスキャンラインと周辺減光（Vignette）の悪化
+- 不穏なグリッチテキストとシステム警告
+- "Entity"（被検体）の姿が、清浄な状態から崩れていく様
+
+### ⚰️ 死と廃棄 (Permadeath & Purge)
+
+HPが0になると、被検体は**終了（Terminated）**します。選択肢は2つ：
+
+- **再起動 (Reboot):** 同じ被検体を蘇生し、恥と共に生きる。
+- **廃棄 (Purge):** データを物理削除し、新たな被検体でやり直す。
 
 ## 🗺️ ロードマップ (Roadmap)
 
-### Phase 1: The Infection ⚡ 完了 (MVP)
-- [x] Notion API コア連携
-- [x] HP 減衰システム
+### Phase 1: The Infection ⚡ 現在 (Current)
+
+- [x] コア・タスク/HPロジック (The Executioner)
 - [x] ホラー UI エフェクト (CRT, Glitches)
-- [x] ステイシスポッドの視覚化
-- [x] デモモード (セットアップ不要)
-- [ ] PWA サポート (モバイル対応)
+- [x] PWA サポート (ホーム画面追加)
+- [x] 検体廃棄 (Purge) メカニズム
 
-### Phase 2: Web3 Integration (2025 Q1)
+### Phase 2: Social Contagion (Next Update)
+
+- [ ] The Graveyard: 死亡したキャラクターの公開追悼墓地
+- [ ] Team Survival: 友人とHPをリンク（連帯責任モード）
+- [ ] Push Notifications: "It's hurting..."（痛み）の通知
+
+### Phase 3: Web3 / Ownership (Future)
+
 - [ ] Solana ウォレット認証
-- [ ] キャラクターの健康状態に応じて変化する Dynamic NFT
-- [ ] アチーブメントシステム (永久生存バッジ)
-- [ ] The Graveyard (死亡したキャラクターの公開追悼墓地)
-- [ ] Revival Protocol (SOLトークンによる蘇生プロトコル)
-
-### Phase 3: Community Features (2025 Q2)
-- [ ] チームサバイバルモード (連帯責任)
-- [ ] グローバルリーダーボード
-- [ ] 生成AIによるホラーシナリオ生成
+- [ ] 健康状態に応じて腐敗・変化する Dynamic NFT
 
 ## 💻 技術スタック (Tech Stack)
 
-**Frontend**: Next.js 14, TypeScript, Tailwind CSS  
-**Backend**: FastAPI, Supabase, Notion API  
-**Future Web3**: Solana, Metaplex NFTs
+- **Frontend:** Next.js 14, TypeScript, Tailwind CSS
+- **Backend:** FastAPI, Supabase (PostgreSQL)
+- **Infrastructure:** Vercel (Frontend), Railway (Backend)
 
 ## 🎯 開発哲学 (Philosophy)
 
-**「感情的なステークス（利害）」を通じた、罪悪感駆動型の生産性。**
+「罪悪感駆動型」生産性。
 
-HOSTAGE は、心理的ホラーを利用して「本物のモチベーション」を生み出します。
-キャラクターの命があなたの生産性に依存しているとき、タスク消化は緊急かつ個人的な問題へと変わります。
+HOSTAGE は、心理的ホラーを利用して「本物のモチベーション」を生み出します。キャラクターの命があなたの生産性に依存しているとき、タスク消化は緊急かつ個人的な問題へと変わります。
 
-これは単なるゲーミフィケーションではありません。
-**先延ばしに対する、感情的な戦争です。**
-
----
+これは単なるゲーミフィケーションではありません。先延ばしに対する、感情的な戦争です。
 
 ## 🛠 開発者の方へ
 
 <details>
-<summary><strong>ローカル開発環境・セルフホスティングのセットアップ</strong></summary>
+  <summary><strong>ローカル開発環境・セルフホスティング</strong></summary>
 
-> ご自身のインフラで HOSTAGE を運用したい場合や、開発に貢献したい場合のみ必要です。
+HOSTAGE はオープンな実験場です。
 
 ### 前提条件
+
 - Python 3.11+
 - Node.js 18+
 - Supabase アカウント
-- Notion インテグレーション・トークン
 
-### 1. データベースセットアップ (Supabase)
-Supabase プロジェクトを作成し、以下のテーブルを用意してください:
-- `profiles`: ユーザー情報
+### 1. データベース (Supabase)
+
+以下のテーブルを作成:
+
 - `pets`: キャラクター状態管理
-- `habits`: 習慣トラッキング
+- `tasks`: 簡易タスク管理
 
-### 2. バックエンドセットアップ
+### 2. バックエンド
 
 ```bash
-# 仮想環境の作成
+# 仮想環境作成
 python -m venv venv
-
-# Activate (Windows)
-.\venv\Scripts\activate
-# Activate (Mac/Linux)
 source venv/bin/activate
 
-# 依存関係のインストール
+# インストール
 pip install -r requirements.txt
 
-# 環境変数の設定
-cp .env.example .env
-```
-
-必要な環境変数 (`.env`):
-
-```env
-SUPABASE_URL=your_supabase_url
-SUPABASE_SERVICE_ROLE_KEY=your_service_key
-NOTION_TOKEN=your_notion_integration_token
-NOTION_DB_ID=your_notion_database_id
-```
-
-サーバーの起動:
-
-```bash
+# 起動
 uvicorn app.main:app --reload
 ```
-API は `http://localhost:8000` で稼働します。
 
-### 3. フロントエンドセットアップ
+### 3. フロントエンド
 
 ```bash
 cd frontend
-
-# パッケージインストール
 npm install
-
-# 開発サーバー起動
 npm run dev
 ```
-
-アプリは `http://localhost:3000` で稼働します。
-
-### ⚠️ MVP設定についての注意
-デモ目的のため、現状のバージョンではユーザーIDや習慣IDをコード内で指定する必要がある場合があります:
-
-```typescript
-// frontend/app/page.tsx
-const USER_ID = "YOUR_SUPABASE_UUID";
-const HABIT_ID = "YOUR_HABIT_UUID";
-```
-
-将来のリリースでは、適切な認証フローに置き換えられる予定です。
 
 </details>
 
 ## 📜 ライセンス
+
 Personal Project - All Rights Reserved
 
 Built with psychological horror and FastAPI 💀
-
-"Your negligence kills."
