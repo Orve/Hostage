@@ -775,6 +775,53 @@ export const dict = {
       ja: '完了！',
     },
   },
+  // ========================================
+  // DEATH TIMER
+  // ========================================
+  timer: {
+    estimated_termination: {
+      en: 'ESTIMATED TERMINATION',
+      ja: '推定終了時刻',
+    },
+    terminated: {
+      en: 'TERMINATED',
+      ja: '停止',
+    },
+    calculating: {
+      en: 'CALCULATING...',
+      ja: '算出中...',
+    },
+  },
+
+  // ========================================
+  // QUICK TASKS
+  // ========================================
+  quick: {
+    focus_label: {
+      en: '30m Focus',
+      ja: '30分集中',
+    },
+    focus_title: {
+      en: 'Deep Work Session',
+      ja: 'ディープワーク・セッション',
+    },
+    reply_label: {
+      en: 'Quick Reply',
+      ja: '即レス処理',
+    },
+    reply_title: {
+      en: 'Clear Inbox / Reply',
+      ja: '受信トレイ整理 / 返信',
+    },
+    reset_label: {
+      en: 'Reset Room',
+      ja: '環境リセット',
+    },
+    reset_title: {
+      en: 'Environment Reset (Clean)',
+      ja: '作業環境リセット（清掃）',
+    },
+  },
 } as const;
 
 /**

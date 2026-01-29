@@ -202,7 +202,7 @@ def toggle_habit_check(habit_id: str):
             decayed_pet = calculate_time_decay(pet_data)
 
             # 習慣完了による回復量（固定）
-            heal_amount = 5.0
+            heal_amount = 10.0
 
             # 回復を適用
             if decayed_pet['status'] == 'ALIVE':

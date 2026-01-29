@@ -4,6 +4,7 @@ import "./globals.css";
 import AuthProvider from "../components/AuthProvider";
 import ErrorBoundary from "../components/ErrorBoundary";
 import LayoutClient from "../components/LayoutClient";
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,6 +51,7 @@ export default function RootLayout({
             </AuthProvider>
           </LayoutClient>
         </ErrorBoundary>
+        <Analytics />
       </body>
     </html>
   );
