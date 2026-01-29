@@ -152,7 +152,16 @@ export default function Home() {
             <TaskManager userId={user?.id || ""} onTaskComplete={refreshPetSilently} />
 
             {/* 習慣管理 */}
-            <HabitManager userId={user?.id || ""} onHabitComplete={refreshPetSilently} />
+            <HabitManager
+              userId={user?.id || ""}
+              onHabitComplete={refreshPetSilently}
+              onHpChange={(delta: number) => {
+                setPet(prev => prev ? {
+                  ...prev,
+                  hp: Math.min(prev.max_hp, Math.max(0, prev.hp + delta)),
+                } : prev);
+              }}
+            />
           </div>
         ) : (
           <CreatePetForm userId={user?.id || ""} onSuccess={loadData} />

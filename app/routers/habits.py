@@ -28,7 +28,7 @@ def complete_habit(payload: HabitComplete):
     decayed_pet = calculate_time_decay(pet_data)
     
     # 4. 回復の適用
-    HEAL_AMOUNT = 5.0 # 小さな習慣に対する定数
+    HEAL_AMOUNT = 10.0
     
     if decayed_pet['status'] == 'ALIVE':
         new_hp = min(float(decayed_pet['max_hp']), decayed_pet['hp'] + HEAL_AMOUNT)

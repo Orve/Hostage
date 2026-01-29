@@ -230,6 +230,37 @@ export default function TaskManager({ userId, onTaskComplete }: TaskManagerProps
         </motion.button>
       </div>
 
+      {/* ========== Quick Task Buttons ========== */}
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        {([
+          { emoji: "⚡", labelKey: "quick.focus_label", titleKey: "quick.focus_title", offsetMs: 30 * 60 * 1000 },
+          { emoji: "📧", labelKey: "quick.reply_label", titleKey: "quick.reply_title", offsetMs: 60 * 60 * 1000 },
+          { emoji: "🧹", labelKey: "quick.reset_label", titleKey: "quick.reset_title", offsetMs: null },
+        ] as const).map((preset) => (
+          <motion.button
+            key={preset.labelKey}
+            whileTap={{ scale: 0.92 }}
+            onClick={async () => {
+              const dueDate = preset.offsetMs
+                ? new Date(Date.now() + preset.offsetMs).toISOString()
+                : (() => { const d = new Date(); d.setHours(23, 59, 59, 0); return d.toISOString(); })();
+              try {
+                await createTask({ user_id: userId, title: t(preset.titleKey), priority: "high", due_date: dueDate });
+                if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(50);
+                await loadTasks();
+              } catch (e) {
+                console.error("Quick task failed:", e);
+                setError(e instanceof Error ? e.message : "QUICK_TASK_FAILED");
+              }
+            }}
+            className="px-2 py-2.5 text-xs font-mono border border-white/20 bg-white/5 hover:bg-white/10 backdrop-blur text-gray-300 tracking-wider active:scale-95 transition-all"
+          >
+            <span className="block text-base mb-0.5">{preset.emoji}</span>
+            {t(preset.labelKey)}
+          </motion.button>
+        ))}
+      </div>
+
       {/* ========== 回復メッセージ ========== */}
       <AnimatePresence>
         {healMessage && (

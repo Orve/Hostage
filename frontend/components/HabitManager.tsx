@@ -14,6 +14,7 @@ import { useTranslation } from "@/lib/i18n/LanguageContext";
 interface HabitManagerProps {
   userId: string;
   onHabitComplete?: () => void; // ペットの状態を更新するためのコールバック
+  onHpChange?: (delta: number) => void; // 楽観的HP更新
 }
 
 /**
@@ -23,7 +24,7 @@ interface HabitManagerProps {
  * サイバーパンク・ホラーな雰囲気を維持しつつ、
  * 炎アイコンでストリークを強調表示する。
  */
-export default function HabitManager({ userId, onHabitComplete }: HabitManagerProps) {
+export default function HabitManager({ userId, onHabitComplete, onHpChange }: HabitManagerProps) {
   const { t, locale } = useTranslation();
   const [habits, setHabits] = useState<DailyHabit[]>([]);
   const [loading, setLoading] = useState(true);
@@ -132,6 +133,7 @@ export default function HabitManager({ userId, onHabitComplete }: HabitManagerPr
     const wasCompleted = isCompletedToday(targetHabit);
 
     // 楽観的更新: 即座にUIを更新
+    const HEAL_AMOUNT = 10.0;
     setHabits((prev) =>
       prev.map((h) => {
         if (h.id !== habitId) return h;
@@ -153,6 +155,11 @@ export default function HabitManager({ userId, onHabitComplete }: HabitManagerPr
         }
       })
     );
+
+    // 楽観的HP更新: チェック時は即座に+10、キャンセル時は-10
+    if (onHpChange) {
+      onHpChange(wasCompleted ? -HEAL_AMOUNT : HEAL_AMOUNT);
+    }
 
     // バックグラウンドでAPI呼び出し
     try {
@@ -181,11 +188,14 @@ export default function HabitManager({ userId, onHabitComplete }: HabitManagerPr
         }
       }
     } catch (e) {
-      // 失敗: ロールバック
+      // 失敗: ロールバック（HP含む）
       console.error("Failed to toggle habit:", e);
       setHabits((prev) =>
         prev.map((h) => (h.id === habitId ? targetHabit : h))
       );
+      if (onHpChange) {
+        onHpChange(wasCompleted ? HEAL_AMOUNT : -HEAL_AMOUNT);
+      }
       setStreakMessage(null);
       setError(e instanceof Error ? e.message : "HABIT_CHECK_FAILED");
     }

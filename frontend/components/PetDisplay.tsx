@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import StasisChamber from './StasisChamber';
+import DeathTimer from './DeathTimer';
 import { getCharacterImageByStatus, DEFAULT_CHARACTER_TYPE } from '@/lib/characterAssets';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 
@@ -128,6 +129,9 @@ export default function PetDisplay({ pet, onRevive, onPurge }: PetProps) {
           </span>
         </div>
       </div >
+
+      {/* ========== Death Timer ========== */}
+      <DeathTimer hp={pet.hp} isDead={isDead} />
     </>
   );
 }

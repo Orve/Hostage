@@ -12,7 +12,7 @@ def create_pet(pet_in: PetCreate):
     new_pet = {
         "user_id": str(pet_in.user_id),
         "name": pet_in.name,
-        "hp": 100.0,
+        "hp": 40.0,
         "max_hp": 100.0,
         "infection_level": 0,
         "status": "ALIVE",
