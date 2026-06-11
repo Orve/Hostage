@@ -17,7 +17,7 @@ class DailyHabitBase(BaseModel):
 
 class DailyHabitCreate(DailyHabitBase):
     """日次習慣作成リクエスト"""
-    user_id: str = Field(..., description="ユーザーID")
+    user_id: Optional[str] = Field(None, description="ユーザーID（廃止予定。サーバー側でJWTから導出）")
 
 
 class DailyHabitResponse(DailyHabitBase):
