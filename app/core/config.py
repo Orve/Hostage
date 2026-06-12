@@ -8,8 +8,8 @@ class Settings(BaseSettings):
     NOTION_TOKEN: str
     NOTION_DB_ID: str
     
-    # Cron用APIキー（ダメージ適用エンドポイントの認証）
-    CRON_SECRET: str = "hostage_cron_secret_2026"
+    # Cron用APIキー（ダメージ適用エンドポイントの認証）。未設定時は起動エラー（fail-closed）
+    CRON_SECRET: str
 
     class Config:
         env_file = ".env"

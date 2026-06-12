@@ -9,7 +9,7 @@ class PetBase(BaseModel):
     character_type: str = "cyber-fairy"
 
 class PetCreate(PetBase):
-    user_id: UUID
+    user_id: Optional[UUID] = None
 
 class PetResponse(PetBase):
     id: UUID
