@@ -9,28 +9,31 @@ import { NextResponse } from 'next/server';
  * Schedule: 毎日 JST 0:00 (UTC 15:00)
  */
 export async function GET(request: Request) {
-  // Vercel Cronからの呼び出しか確認（オプション）
-  const authHeader = request.headers.get('Authorization');
   const cronSecret = process.env.CRON_SECRET;
 
-  // Bearer形式でCRON_SECRETが送られてくる場合の検証
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    // 本番では厳格にチェック、開発時はスキップ可能
-    console.warn('[CRON] Authorization header mismatch or missing');
-    // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // CRON_SECRET未設定時はfail-closed
+  if (!cronSecret) {
+    console.error('[CRON] CRON_SECRET is not configured');
+    return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 });
+  }
+
+  // Vercel Cronは Authorization: Bearer <CRON_SECRET> を自動付与する
+  const authHeader = request.headers.get('Authorization');
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    console.warn('[CRON] Unauthorized request to cron proxy');
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-  const apiKey = process.env.CRON_SECRET || 'hostage_cron_secret_2026';
 
   try {
     console.log('[CRON] Triggering daily damage calculation...');
 
-    // バックエンドのダメージAPIを呼び出し
+    // バックエンドのダメージAPIを呼び出し（同じCRON_SECRETをX-API-KEYとして使用）
     const response = await fetch(`${backendUrl}/tasks/cron/damage`, {
       method: 'GET',
       headers: {
-        'X-API-KEY': apiKey,
+        'X-API-KEY': cronSecret,
         'Content-Type': 'application/json',
       },
     });
