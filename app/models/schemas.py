@@ -16,7 +16,12 @@ class PetResponse(PetBase):
     user_id: UUID
     hp: float
     max_hp: float
-    infection_level: int
+    infection_level: int  # 腐敗度 (0-100)
+    hunger: float = 0.0
+    mood: float = 50.0
+    evolution_stage: int = 0
+    evolution_path: Optional[str] = None
+    care_score: float = 50.0
     status: Literal['ALIVE', 'DEAD']
     last_checked_at: datetime
     born_at: datetime

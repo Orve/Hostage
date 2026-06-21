@@ -14,9 +14,9 @@ from pydantic import BaseModel, Field
 from typing import Optional, List, Literal
 from datetime import datetime, timezone
 from uuid import UUID
-import os
+from app.core.config import settings
 from app.services.supabase import client
-from app.services.game_logic import calculate_time_decay
+from app.services.game_logic import calculate_time_decay, update_care_score
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -217,15 +217,21 @@ def complete_task(payload: TaskComplete):
     }
     heal_amount = heal_amounts.get(task["priority"], 5.0)
     
-    # 回復を適用
+    # 回復・パラメータ更新
+    hunger_reduction = {"low": 8.0, "medium": 12.0, "high": 16.0, "critical": 20.0}
+    new_hunger = max(0.0, float(decayed_pet.get('hunger', 0)) - hunger_reduction.get(task["priority"], 10.0))
+    new_care_score = update_care_score(float(decayed_pet.get('care_score', 50)), 'task_complete')
+
     if decayed_pet['status'] == 'ALIVE':
         new_hp = min(float(decayed_pet['max_hp']), decayed_pet['hp'] + heal_amount)
         decayed_pet['hp'] = new_hp
-    
+
     # ペットを更新
     pet_update = {
         "hp": decayed_pet['hp'],
         "status": decayed_pet['status'],
+        "hunger": new_hunger,
+        "care_score": new_care_score,
         "last_checked_at": datetime.now(timezone.utc).isoformat()
     }
     
@@ -345,7 +351,7 @@ def apply_daily_damage(
     注意: Vercel CronはGETリクエストを送信するため、GETで実装。
     """
     # セキュリティチェック
-    expected_key = os.getenv("CRON_SECRET", "hostage_cron_secret_2026")
+    expected_key = settings.CRON_SECRET
     if x_api_key != expected_key:
         raise HTTPException(status_code=403, detail="Unauthorized: Invalid API Key")
 

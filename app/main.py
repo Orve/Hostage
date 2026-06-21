@@ -1,15 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import pets, habits, sync, tasks, daily_habits
-import os
+from app.core.config import settings
 
 app = FastAPI(title="HOSTAGE MVP")
 
 # CORS設定（環境変数で本番/開発を切り替え）
-allowed_origins = os.getenv(
-    "ALLOWED_ORIGINS",
-    "http://localhost:3000,https://hostage-app.vercel.app,http://127.0.0.1:3000"
-).split(",")
+allowed_origins = settings.ALLOWED_ORIGINS.split(",")
 
 app.add_middleware(
     CORSMiddleware,
@@ -28,3 +25,6 @@ app.include_router(habits.router)
 app.include_router(sync.router)
 app.include_router(tasks.router)
 app.include_router(daily_habits.router)
+
+from mangum import Mangum
+handler = Mangum(app, lifespan="off")

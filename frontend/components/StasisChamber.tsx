@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import DeathOverlay from './DeathOverlay';
+import { getEvolutionFilter, getEvolutionStageName, getCorruptionOverlayOpacity } from '@/lib/characterAssets';
 
 type StasisChamberProps = {
   hp: number;
@@ -9,14 +10,18 @@ type StasisChamberProps = {
   imageSrc: string;
   status: 'ALIVE' | 'DEAD' | 'CRITICAL' | 'UNINITIALIZED';
   characterType?: string;
-  onRevive?: () => void; // 蘇生アクション用コールバック
-  onPurge?: () => void; // 削除アクション用コールバック
-  // インタラクション用のオプション
+  onRevive?: () => void;
+  onPurge?: () => void;
   glowIntensity?: 'low' | 'normal' | 'high';
-  // 誕生シーケンス用のオプション
-  fillLevel?: number;           // 0-100: 培養液の充填レベル（省略時は100）
-  characterVisible?: boolean;   // キャラクターの表示状態（省略時はtrue）
-  characterOpacity?: number;    // キャラクターの透明度（0-1、省略時は1）
+  fillLevel?: number;
+  characterVisible?: boolean;
+  characterOpacity?: number;
+  // たまごっちパラメータ
+  hunger?: number;
+  mood?: number;
+  corruption?: number;
+  evolutionStage?: number;
+  evolutionPath?: 'light' | 'dark' | null;
 };
 
 /**
@@ -119,12 +124,26 @@ export default function StasisChamber({
   characterType,
   onRevive,
   onPurge,
+  hunger = 0,
+  mood = 50,
+  corruption = 0,
+  evolutionStage = 0,
+  evolutionPath = null,
 }: StasisChamberProps) {
-  // HP比率を計算
   const hpRatio = Math.max(0, Math.min(100, (hp / maxHp) * 100));
-
-  // 劣化段階を計算
   const decayStage = useMemo(() => getDecayStage(hpRatio), [hpRatio]);
+  const evolutionFilter = useMemo(
+    () => getEvolutionFilter(evolutionStage, evolutionPath),
+    [evolutionStage, evolutionPath]
+  );
+  const evolutionStageName = useMemo(
+    () => getEvolutionStageName(evolutionStage, evolutionPath),
+    [evolutionStage, evolutionPath]
+  );
+  const corruptionOpacity = useMemo(
+    () => getCorruptionOverlayOpacity(corruption),
+    [corruption]
+  );
 
   // HPに応じた流体の色を決定（5段階対応）
   const fluidColor = useMemo(() => {
@@ -263,10 +282,14 @@ export default function StasisChamber({
             ${decayGlow}
           `}
           style={{
-            filter: decayFilter,
+            filter: evolutionStage === 0
+              ? 'blur(3px) brightness(0.5) saturate(0)'
+              : `${decayFilter} ${evolutionFilter !== 'none' ? evolutionFilter : ''}`.trim(),
             transformStyle: 'preserve-3d',
             opacity: characterVisible ? characterOpacity : 0,
-            transform: characterVisible ? (characterType === 'void-geometry' ? 'scale(1.1)' : 'scale(1.25)') : 'scale(0.8)',
+            transform: characterVisible
+              ? (characterType === 'void-geometry' ? 'scale(1.1)' : 'scale(1.25)')
+              : 'scale(0.8)',
           }}
         />
       </div>
@@ -320,6 +343,17 @@ export default function StasisChamber({
           </>
         )}
 
+        {/* 腐敗オーバーレイ（corruption値が高いほど紫の汚染が広がる） */}
+        {corruptionOpacity > 0 && (
+          <div
+            className="absolute inset-0 pointer-events-none rounded"
+            style={{
+              background: `radial-gradient(ellipse at center, transparent 30%, rgba(147,51,234,${corruptionOpacity}) 100%)`,
+              mixBlendMode: 'multiply',
+            }}
+          />
+        )}
+
         {/* 培養槽のフレーム装飾 */}
         <div className={`absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent ${decayStage === 'critical' ? 'via-red-500' : 'via-cyan-500'} to-transparent opacity-50 transition-colors duration-1000`} />
         <div className={`absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent ${decayStage === 'critical' ? 'via-red-500' : 'via-cyan-500'} to-transparent opacity-50 transition-colors duration-1000`} />
@@ -360,6 +394,50 @@ export default function StasisChamber({
         <div className="text-[10px] opacity-70 mt-0.5">
           STATUS: {status} {status !== 'DEAD' && status !== 'UNINITIALIZED' && `[${decayStage.toUpperCase()}]`}
         </div>
+        {status !== 'UNINITIALIZED' && status !== 'DEAD' && (
+          <div className="mt-1 space-y-0.5 min-w-[120px]">
+            {/* 飢餓度 */}
+            <div className="flex items-center gap-1">
+              <span className="text-[9px] text-orange-400 w-12">HUNGER</span>
+              <div className="flex-1 h-1 bg-gray-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${hunger}%`, backgroundColor: hunger > 70 ? '#ef4444' : '#f97316' }}
+                />
+              </div>
+            </div>
+            {/* 機嫌度 */}
+            <div className="flex items-center gap-1">
+              <span className="text-[9px] text-cyan-400 w-12">MOOD</span>
+              <div className="flex-1 h-1 bg-gray-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${mood}%`, backgroundColor: mood > 60 ? '#22d3ee' : '#6b7280' }}
+                />
+              </div>
+            </div>
+            {/* 腐敗度 */}
+            <div className="flex items-center gap-1">
+              <span className="text-[9px] text-purple-400 w-12">CORRUPT</span>
+              <div className="flex-1 h-1 bg-gray-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${corruption}%`, backgroundColor: corruption > 50 ? '#9333ea' : '#7c3aed' }}
+                />
+              </div>
+            </div>
+            {/* 進化ステージ */}
+            <div className="text-[9px] mt-0.5">
+              <span className={`px-1 py-0.5 rounded ${
+                evolutionPath === 'light' ? 'text-yellow-300 bg-yellow-900/40' :
+                evolutionPath === 'dark' ? 'text-purple-300 bg-purple-900/40' :
+                'text-gray-400 bg-gray-800/40'
+              }`}>
+                ▶ {evolutionStageName}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -13,11 +13,15 @@ interface PetProps {
     max_hp: number;
     status: 'ALIVE' | 'DEAD' | 'CRITICAL';
     infection_level: number;
-    id: string; // IDを追加（API呼び出しに必要）
-    character_type?: string; // キャラクタータイプ
+    hunger?: number;
+    mood?: number;
+    evolution_stage?: number;
+    evolution_path?: 'light' | 'dark' | null;
+    id: string;
+    character_type?: string;
   } | null;
-  onRevive?: () => void; // 親から蘇生関数を受け取る
-  onPurge?: () => void; // 親から削除関数を受け取る
+  onRevive?: () => void;
+  onPurge?: () => void;
 }
 
 /**
@@ -90,6 +94,11 @@ export default function PetDisplay({ pet, onRevive, onPurge }: PetProps) {
           onRevive={onRevive}
           onPurge={onPurge}
           characterType={pet.character_type || DEFAULT_CHARACTER_TYPE}
+          hunger={pet.hunger ?? 0}
+          mood={pet.mood ?? 50}
+          corruption={pet.infection_level ?? 0}
+          evolutionStage={pet.evolution_stage ?? 0}
+          evolutionPath={pet.evolution_path ?? null}
         />
       </div>
 

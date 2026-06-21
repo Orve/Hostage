@@ -38,13 +38,13 @@ httpx.Client.__init__ = _patched_httpx_client_init
 
 # パッチ適用後にsupabaseをインポート
 from supabase import create_client, Client
+from app.core.config import settings
 
 # ==========================================
 # 🔑 Environment Variables
 # ==========================================
-# 設定ファイル(settings)を経由せず、OSから直接値を取得して確実性を高めます。
-url = os.environ.get("SUPABASE_URL")
-key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+url = settings.SUPABASE_URL
+key = settings.SUPABASE_SERVICE_ROLE_KEY
 
 # デバッグ用: キーがない場合はRailwayのログに警告を出す
 if not url:

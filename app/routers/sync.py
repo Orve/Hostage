@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from app.services.supabase import client
 from datetime import datetime, timezone
-import os
+from app.core.config import settings
 
 router = APIRouter(prefix="/cron", tags=["cron"])
 
@@ -98,7 +98,7 @@ def manual_damage(secret: str = Query(...)):
     """
     QAテスト用: 手動で全ペットにダメージを与える（検証用）
     """
-    if secret != os.getenv("CRON_SECRET", "my_test_secret"):
+    if secret != settings.CRON_SECRET:
         raise HTTPException(status_code=403, detail="Invalid Secret")
 
     # 本来は全ユーザーだが、テスト用なので「生きている全ペット」に固定ダメージを与える

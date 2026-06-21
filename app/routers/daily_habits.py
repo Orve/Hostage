@@ -14,7 +14,7 @@ from app.models.daily_habit import (
     DailyHabitCheckResponse
 )
 from app.services.supabase import client
-from app.services.game_logic import calculate_time_decay
+from app.services.game_logic import calculate_time_decay, update_care_score
 
 router = APIRouter(prefix="/daily-habits", tags=["daily-habits"])
 
@@ -201,19 +201,22 @@ def toggle_habit_check(habit_id: str):
             # 減衰を適用
             decayed_pet = calculate_time_decay(pet_data)
 
-            # 習慣完了による回復量（固定）
             heal_amount = 10.0
+            new_mood = min(100.0, float(decayed_pet.get('mood', 50)) + 15.0)
+            new_corruption = max(0, int(decayed_pet.get('infection_level', 0)) - 10)
+            new_care_score = update_care_score(float(decayed_pet.get('care_score', 50)), 'habit_complete')
 
-            # 回復を適用
             if decayed_pet['status'] == 'ALIVE':
                 new_hp = min(float(decayed_pet['max_hp']), decayed_pet['hp'] + heal_amount)
                 decayed_pet['hp'] = new_hp
                 healed_amount = heal_amount
 
-            # ペットを更新
             pet_update = {
                 "hp": decayed_pet['hp'],
                 "status": decayed_pet['status'],
+                "mood": new_mood,
+                "infection_level": new_corruption,
+                "care_score": new_care_score,
                 "last_checked_at": datetime.now(timezone.utc).isoformat()
             }
 
