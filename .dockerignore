@@ -1,0 +1,15 @@
+infra/
+infra/cdk.out/
+frontend/
+.git/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+.env
+venv/
+.venv/
+*.md
+.github/
+docs/
+database/
+scripts/

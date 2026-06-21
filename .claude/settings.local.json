@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(git commit:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "mcp__headroom__headroom_retrieve",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 *)"
     ]
   }
 }
