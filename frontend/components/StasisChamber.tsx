@@ -394,50 +394,6 @@ export default function StasisChamber({
         <div className="text-[10px] opacity-70 mt-0.5">
           STATUS: {status} {status !== 'DEAD' && status !== 'UNINITIALIZED' && `[${decayStage.toUpperCase()}]`}
         </div>
-        {status !== 'UNINITIALIZED' && status !== 'DEAD' && (
-          <div className="mt-1 space-y-0.5 min-w-[120px]">
-            {/* 飢餓度 */}
-            <div className="flex items-center gap-1">
-              <span className="text-[9px] text-orange-400 w-12">HUNGER</span>
-              <div className="flex-1 h-1 bg-gray-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{ width: `${hunger}%`, backgroundColor: hunger > 70 ? '#ef4444' : '#f97316' }}
-                />
-              </div>
-            </div>
-            {/* 機嫌度 */}
-            <div className="flex items-center gap-1">
-              <span className="text-[9px] text-cyan-400 w-12">MOOD</span>
-              <div className="flex-1 h-1 bg-gray-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{ width: `${mood}%`, backgroundColor: mood > 60 ? '#22d3ee' : '#6b7280' }}
-                />
-              </div>
-            </div>
-            {/* 腐敗度 */}
-            <div className="flex items-center gap-1">
-              <span className="text-[9px] text-purple-400 w-12">CORRUPT</span>
-              <div className="flex-1 h-1 bg-gray-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{ width: `${corruption}%`, backgroundColor: corruption > 50 ? '#9333ea' : '#7c3aed' }}
-                />
-              </div>
-            </div>
-            {/* 進化ステージ */}
-            <div className="text-[9px] mt-0.5">
-              <span className={`px-1 py-0.5 rounded ${
-                evolutionPath === 'light' ? 'text-yellow-300 bg-yellow-900/40' :
-                evolutionPath === 'dark' ? 'text-purple-300 bg-purple-900/40' :
-                'text-gray-400 bg-gray-800/40'
-              }`}>
-                ▶ {evolutionStageName}
-              </span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
