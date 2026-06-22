@@ -15,8 +15,8 @@ export default function ScreenEffect() {
         style={{
           width: '100vw',
           height: '100dvh',
-          background: 'linear-gradient(to bottom, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%)',
-          backgroundSize: '100% 4px',
+          background: 'linear-gradient(to bottom, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.08) 50%)',
+          backgroundSize: '100% 6px',
         }}
       />
 
