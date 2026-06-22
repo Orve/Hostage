@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import StasisChamber from './StasisChamber';
 import DeathTimer from './DeathTimer';
-import { getCharacterImageByStatus, DEFAULT_CHARACTER_TYPE } from '@/lib/characterAssets';
+import { getCharacterImageByStatus, DEFAULT_CHARACTER_TYPE, getEvolutionStageName } from '@/lib/characterAssets';
 import { useTranslation } from '@/lib/i18n/LanguageContext';
 
 interface PetProps {
@@ -138,6 +138,89 @@ export default function PetDisplay({ pet, onRevive, onPurge }: PetProps) {
           </span>
         </div>
       </div >
+
+      {/* ========== たまごっちパラメータ ========== */}
+      {!isDead && (
+        <div className="mb-6 space-y-3 border border-gray-800 rounded p-4 bg-gray-950/60">
+          {/* 進化ステージバッジ */}
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] tracking-widest text-gray-500 uppercase">Evolution</span>
+            <span className={`text-xs font-bold tracking-widest px-2 py-0.5 rounded ${
+              pet.evolution_path === 'light' ? 'text-yellow-300 bg-yellow-900/50 border border-yellow-700/50' :
+              pet.evolution_path === 'dark'  ? 'text-purple-300 bg-purple-900/50 border border-purple-700/50' :
+              'text-cyan-400 bg-cyan-900/30 border border-cyan-800/40'
+            }`}>
+              ▶ {getEvolutionStageName(pet.evolution_stage ?? 0, pet.evolution_path ?? null)}
+            </span>
+          </div>
+
+          {/* HUNGER */}
+          <div>
+            <div className="flex justify-between text-[10px] mb-1 uppercase tracking-widest">
+              <span className="text-orange-400">Hunger</span>
+              <span className={`font-mono ${(pet.hunger ?? 0) > 70 ? 'text-red-400' : 'text-orange-300'}`}>
+                {Math.round(pet.hunger ?? 0)}%
+              </span>
+            </div>
+            <div className="h-2 w-full bg-gray-900 border border-gray-800 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${pet.hunger ?? 0}%`,
+                  background: (pet.hunger ?? 0) > 70
+                    ? 'linear-gradient(90deg, #f97316, #ef4444)'
+                    : 'linear-gradient(90deg, #92400e, #f97316)',
+                  boxShadow: (pet.hunger ?? 0) > 70 ? '0 0 8px #ef4444' : 'none',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* MOOD */}
+          <div>
+            <div className="flex justify-between text-[10px] mb-1 uppercase tracking-widest">
+              <span className="text-cyan-400">Mood</span>
+              <span className={`font-mono ${(pet.mood ?? 50) > 60 ? 'text-cyan-300' : 'text-gray-400'}`}>
+                {Math.round(pet.mood ?? 50)}%
+              </span>
+            </div>
+            <div className="h-2 w-full bg-gray-900 border border-gray-800 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${pet.mood ?? 50}%`,
+                  background: (pet.mood ?? 50) > 60
+                    ? 'linear-gradient(90deg, #0891b2, #22d3ee)'
+                    : 'linear-gradient(90deg, #374151, #6b7280)',
+                  boxShadow: (pet.mood ?? 50) > 60 ? '0 0 8px #22d3ee55' : 'none',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* CORRUPT */}
+          <div>
+            <div className="flex justify-between text-[10px] mb-1 uppercase tracking-widest">
+              <span className="text-purple-400">Corrupt</span>
+              <span className={`font-mono ${(pet.infection_level ?? 0) > 50 ? 'text-purple-300' : 'text-gray-400'}`}>
+                {Math.round(pet.infection_level ?? 0)}%
+              </span>
+            </div>
+            <div className="h-2 w-full bg-gray-900 border border-gray-800 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${pet.infection_level ?? 0}%`,
+                  background: (pet.infection_level ?? 0) > 50
+                    ? 'linear-gradient(90deg, #7c3aed, #c026d3)'
+                    : 'linear-gradient(90deg, #3b0764, #7c3aed)',
+                  boxShadow: (pet.infection_level ?? 0) > 50 ? '0 0 10px #9333ea88' : 'none',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ========== Death Timer ========== */}
       <DeathTimer hp={pet.hp} isDead={isDead} />
