@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Dict, Any
 
-DECAY_COEFFICIENT = 0.5
+DECAY_COEFFICIENT = 0.8  # HP/時間（hunger=0, mood=50時。24時間で約19HP減）
 
 # 飢餓度: 1時間で +2 (50時間でMAX)
 HUNGER_RATE_PER_HOUR = 2.0
@@ -49,7 +49,7 @@ def calculate_time_decay(pet: Dict[str, Any]) -> Dict[str, Any]:
 
     # HP減衰: 飢餓が高いほど加速
     hunger_multiplier = 1.0 + (new_hunger / 100.0)
-    damage = (hours_passed ** 2) * DECAY_COEFFICIENT * hunger_multiplier
+    damage = hours_passed * DECAY_COEFFICIENT * hunger_multiplier
 
     # 機嫌が高いと微回復ボーナス
     regen = (new_mood / 200.0) * hours_passed
